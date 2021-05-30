@@ -1,16 +1,20 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 # Create your models here.
 
 
-class User(AbstractUser):
+class CustomUser(models.Model):
     """Пользователь"""
     SEX_CHOICES = (("M", "Мужской"), ("F", "Женский"))
+
+    user = models.OneToOneField(
+        User, verbose_name="Пользователь", on_delete=models.CASCADE)
     surname = models.CharField("Фамилия", max_length=150, blank=True)
     name = models.CharField("Имя", max_length=150, blank=True)
     patricity = models.CharField("Отчество", max_length=150, blank=True)
     birthday = models.DateField("Дата рождения", blank=True, null=True)
-    sex = models.CharField(max_length=1, choices=SEX_CHOICES, blank=True)
+    sex = models.CharField(verbose_name="Пол", max_length=1,
+                           choices=SEX_CHOICES, blank=True)
     native_language = models.CharField(
         "Родной язык", max_length=150, blank=True)
     citizenship = models.CharField("Гражданство", max_length=150, blank=True)
@@ -44,4 +48,10 @@ class User(AbstractUser):
         "Членство в организациях", blank=True)
 
     def __str__(self):
-        return str(self.name + " " + self.surname)
+        return str(self.surname + " " + self.name)
+
+    class Meta:
+        # db_table = 'CustomUser'
+        managed = True
+        verbose_name = 'Пользователь системы'
+        verbose_name_plural = 'Пользователи системы'
