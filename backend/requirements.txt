@@ -4,3 +4,4 @@ django-environ
 django-extensions
 djangorestframework
 psycopg2-binary
+# secretary
