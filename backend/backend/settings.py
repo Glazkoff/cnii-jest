@@ -43,7 +43,7 @@ DJANGO_APPS = ['django.contrib.admin',
 THIRD_PARTY_APPS = ['rest_framework']
 
 LOCAL_APPS = [
-    # 'documents',
+    'documents',
     'users'
 ]
 
@@ -62,6 +62,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
+    # Для генерации документов
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
@@ -74,7 +75,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
