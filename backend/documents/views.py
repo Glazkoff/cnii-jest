@@ -17,8 +17,11 @@ def doc_test(request):
     # doc_io = io.BytesIO()  # create a file-like object
     # doc.save(doc_io)  # save data to file-like object
     # doc_io.seek(0)  # go to the beginning of the file-like object
-    templatePath = os.path.join(MEDIA_ROOT, "template3.odt")
-    result = engine.render(templatePath, title="NGLAZKOV studio")
+    templatePath = os.path.join(MEDIA_ROOT, "template2.odt")
+    context = {
+        'title': 'TITLE'
+    }
+    result = engine.render(templatePath, **context)
     resp = HttpResponse(
         content_type='application/vnd.oasis.opendocument.text;   charset=UTF-8')
     resp["Content-Disposition"] = "inline; filename=generated_doc.odt"
