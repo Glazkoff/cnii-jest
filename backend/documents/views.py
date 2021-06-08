@@ -17,11 +17,26 @@ def doc_test(request):
     # doc_io = io.BytesIO()  # create a file-like object
     # doc.save(doc_io)  # save data to file-like object
     # doc_io.seek(0)  # go to the beginning of the file-like object
-    templatePath = os.path.join(MEDIA_ROOT, "template2.odt")
-    context = {
-        'title': 'TITLE'
-    }
-    result = engine.render(templatePath, **context)
+    templatePath = os.path.join(MEDIA_ROOT, "template.fodt")
+    template = open(templatePath, 'rb')
+    # context = {
+    #     'title': 'TITLE'
+    # }
+    # result = engine.render(templatePath, **context)
+    countries = [
+        {'country': 'United States', 'capital': 'Washington', 'cities': [
+            'miami', 'new york', 'california', 'texas', 'atlanta']},
+        {'country': 'England', 'capital': 'London', 'cities': ['gales']},
+        {'country': 'Japan', 'capital': 'Tokio',
+            'cities': ['hiroshima', 'nagazaki']},
+        {'country': 'Nicaragua', 'capital': 'Managua',
+            'cities': ['leon', 'granada', 'masaya']},
+        {'country': 'Argentina', 'capital': 'Buenos aires'},
+        {'country': 'Chile', 'capital': 'Santiago'},
+        {'country': 'Mexico', 'capital': 'MExico City',
+            'cities': ['puebla', 'cancun']},
+    ]
+    result = engine.render(template, countries=countries)
     resp = HttpResponse(
         content_type='application/vnd.oasis.opendocument.text;   charset=UTF-8')
     resp["Content-Disposition"] = "inline; filename=generated_doc.odt"
