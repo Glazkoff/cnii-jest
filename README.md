@@ -1,5 +1,10 @@
 # Проект Харламенкова А.Е. (ЦНИИ Русского жестового языка)
 
+## TODO:
+
+- [] Попробовать [web-odt](https://pythonhosted.org/django-webodt/quickstart.html)
+- [] Попробовать Secretary
+
 ## Как запустить проект
 
 1. Убедиться, что virtualenv установлена локально или установить - `python -m venv venv`
