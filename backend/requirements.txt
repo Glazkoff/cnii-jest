@@ -9,8 +9,8 @@ ezodf
 odfpy
 lxml
 django-admin-interface
+Pillow
 # django-appypod
 # django-webodt
 # django-template-engines
-# Pillow
 # django-template-engines

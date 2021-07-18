@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 class CustomUser(models.Model):
     """Пользователь"""
     SEX_CHOICES = (("M", "Мужской"), ("F", "Женский"))
-
     user = models.OneToOneField(
         User, verbose_name="Пользователь", on_delete=models.CASCADE)
     surname = models.CharField("Фамилия", max_length=150, blank=True)
@@ -27,10 +26,10 @@ class CustomUser(models.Model):
     home_address = models.CharField(
         "Домашний адрес", max_length=150, blank=True)
     passport = models.CharField("Данные паспорта", max_length=150, blank=True)
-    passport_part1_scan_url = models.URLField(
-        "URLСканаПаспортаРазворот1", blank=True)
-    passport_part2_scan_url = models.URLField(
-        "URLСканаПаспортаРазворот2", blank=True)
+    passport_part1_scan = models.ImageField(verbose_name="Скан паспорта (часть 1)",
+                                                upload_to='passport_part1', blank=True)
+    passport_part2_scan = models.ImageField(verbose_name="Скан паспорта (часть 2)",
+                                                upload_to='passport_part2', blank=True)
     email = models.EmailField("E-mail", max_length=150, blank=True)
     personal_phone = models.CharField(
         "Мобильный телефон", max_length=150, blank=True)
