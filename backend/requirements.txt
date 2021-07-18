@@ -8,6 +8,7 @@ secretary
 ezodf
 odfpy
 lxml
+django-admin-interface
 # django-appypod
 # django-webodt
 # django-template-engines
