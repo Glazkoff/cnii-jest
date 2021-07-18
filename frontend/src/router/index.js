@@ -1,14 +1,64 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import store from "../store/index.js";
+
+import Main from "../views/Main.vue";
+import Auth from "@/components/auth/Auth.vue";
+import LogIn from "@/components/auth/LogIn.vue";
+import SignUp from "@/components/auth/SignUp.vue";
+import UserStatusScreen from "@/components/users_screen/UserStatusScreen.vue";
 
 Vue.use(VueRouter);
+
+const ifAuthenticated = (to, from, next) => {
+  if (store.state.firstPath == null) {
+    store.commit("SET_FIRST_PATH", to.path);
+  }
+
+  if (store.getters.isAuthenticated) {
+    next();
+    return;
+  }
+  next("/login");
+};
+
+const ifNotAuthenticated = (to, from, next) => {
+  if (!store.getters.isAuthenticated) {
+    next();
+    return;
+  }
+  next("/");
+};
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    component: Main,
+    children: [
+      {
+        path: "/login",
+        component: Auth,
+        beforeEnter: ifNotAuthenticated,
+        children: [
+          {
+            path: "/",
+            name: "LogIn",
+            component: LogIn
+          },
+          {
+            path: "/signup",
+            name: "SignUp",
+            component: SignUp
+          }
+        ]
+      },
+      {
+        path: "/",
+        name: "UserStatusScreen",
+        beforeEnter: ifAuthenticated,
+        component: UserStatusScreen
+      }
+    ]
   },
   {
     path: "/about",
@@ -17,14 +67,14 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
-  },
+      import(/* webpackChunkName: "about" */ "../views/About.vue")
+  }
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes,
+  routes
 });
 
 export default router;

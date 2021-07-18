@@ -1,50 +1,46 @@
 <template>
-  <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <router-view />
-    </v-main>
-  </v-app>
+  <router-view />
 </template>
 
 <script>
 export default {
   name: "App",
-
+  async mounted() {
+    let refreshToken = localStorage.getItem("t");
+    if (refreshToken !== null) {
+      this.$store.commit("START_APP_LOADING");
+      this.$store.dispatch("REFRESH_TOKEN").then(
+        () => {
+          this.$store.commit("STOP_APP_LOADING");
+          let futurePath = "/";
+          if (this.$store.state.first_path != null) {
+            futurePath = this.$store.state.first_path;
+          }
+          if (
+            this.$route.path != futurePath &&
+            this.$route.path.substring(0, this.$route.path.length - 1) !=
+              futurePath
+          ) {
+            this.$router.push({ path: futurePath });
+          }
+        },
+        errors => {
+          this.$store.commit("STOP_APP_LOADING");
+          console.log("ERROR: ", errors);
+        }
+      );
+    }
+  },
   data: () => ({
     //
-  }),
+  })
 };
 </script>
+
+<style lang="scss">
+.v-application--wrap {
+  main {
+    padding: 0 !important;
+  }
+}
+</style>
