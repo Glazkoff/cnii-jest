@@ -10,6 +10,9 @@ odfpy
 lxml
 django-admin-interface
 Pillow
+dj-rest-auth[with_social]
+djangorestframework-simplejwt
+markdown
 # django-appypod
 # django-webodt
 # django-template-engines

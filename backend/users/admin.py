@@ -32,6 +32,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.unregister(Theme)
+# admin.site.unregister(Tokens)
 
 admin.site.site_header = "Админпанель системы ЦНИИ Русского жестового языка"
 admin.site.site_title = "Админпанель ЦНИИ Русского жестового языка"
