@@ -3,8 +3,14 @@ import io
 from django.http import HttpResponse
 from secretary import Renderer
 from backend.settings import MEDIA_ROOT
-from django.http import FileResponse
+# from django.http import FileResponse
 from tempfile import TemporaryFile, NamedTemporaryFile
+from ezodf import newdoc, Paragraph, Heading, Sheet, opendoc
+import os
+import zipfile
+import tempfile
+from odf import text, teletype
+from odf.opendocument import load
 
 
 def doc_test(request):
@@ -17,26 +23,25 @@ def doc_test(request):
     # doc_io = io.BytesIO()  # create a file-like object
     # doc.save(doc_io)  # save data to file-like object
     # doc_io.seek(0)  # go to the beginning of the file-like object
-    templatePath = os.path.join(MEDIA_ROOT, "template.fodt")
+
+    odt = newdoc(doctype='odt', filename=os.path.join(
+        MEDIA_ROOT, "result2.odt"))
+    odt.body += Heading("Chapter 1")
+    odt.body += Paragraph("This is a paragraph.")
+    odt.save()
+
+    doc = opendoc(os.path.join(
+        MEDIA_ROOT, "template2.odt"))
+    print('!!!!!!!!!!!!!!!!!!!!!')
+    print(repr(doc.body.variables.__dict__))
+
+    templatePath = os.path.join(MEDIA_ROOT, "result2.odt")
     template = open(templatePath, 'rb')
-    # context = {
-    #     'title': 'TITLE'
-    # }
-    # result = engine.render(templatePath, **context)
-    countries = [
-        {'country': 'United States', 'capital': 'Washington', 'cities': [
-            'miami', 'new york', 'california', 'texas', 'atlanta']},
-        {'country': 'England', 'capital': 'London', 'cities': ['gales']},
-        {'country': 'Japan', 'capital': 'Tokio',
-            'cities': ['hiroshima', 'nagazaki']},
-        {'country': 'Nicaragua', 'capital': 'Managua',
-            'cities': ['leon', 'granada', 'masaya']},
-        {'country': 'Argentina', 'capital': 'Buenos aires'},
-        {'country': 'Chile', 'capital': 'Santiago'},
-        {'country': 'Mexico', 'capital': 'MExico City',
-            'cities': ['puebla', 'cancun']},
-    ]
-    result = engine.render(template, countries=countries)
+    context = {
+        'title': 'TITLE'
+    }
+    result = engine.render(templatePath, **context)
+
     resp = HttpResponse(
         content_type='application/vnd.oasis.opendocument.text;   charset=UTF-8')
     resp["Content-Disposition"] = "inline; filename=generated_doc.odt"
