@@ -1,12 +1,10 @@
 <template>
-  <v-container>
-    <div>UserStatusScreen</div>
-  </v-container>
+  <div>AttestableView</div>
 </template>
 
 <script>
 export default {
-  name: "UserStatusScreen"
+  name: "AttestableView"
 };
 </script>
 

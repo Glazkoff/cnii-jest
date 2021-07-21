@@ -2,7 +2,7 @@
   <v-app id="app">
     <AppBar @change-drawer="changeDrawer"></AppBar>
     <v-navigation-drawer v-model="drawer" fixed temporary></v-navigation-drawer>
-    <v-main class="pa-0 my-class">
+    <v-main>
       <v-container fill-height v-if="isAppLoading">
         <v-layout align-center="align-center" justify-center="justify-center">
           <v-progress-circular
@@ -44,8 +44,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-main {
-  padding: 0 !important;
-}
-</style>
+<style lang="scss" scoped></style>

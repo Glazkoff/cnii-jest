@@ -37,10 +37,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.v-application--wrap {
-  main {
-    padding: 0 !important;
-  }
-}
-</style>
+<style lang="scss"></style>
