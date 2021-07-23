@@ -34,5 +34,5 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.unregister(Theme)
 
 admin.site.site_header = "Админпанель системы ЦНИИ Русского жестового языка"
-admin.site.site_title = "Админпанель ЦНИИ Русского жестового языка"
+admin.site.site_title = "Админпанель системы ЦНИИ Русского жестового языка"
 admin.site.index_title = "Административная часть сайта ЦНИИ Русского жестового языка"
