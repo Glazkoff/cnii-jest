@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <div>UserStatusScreen</div>
+    <router-view></router-view>
   </v-container>
 </template>
 

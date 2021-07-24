@@ -7,6 +7,7 @@ import Auth from "@/components/auth/Auth.vue";
 import LogIn from "@/components/auth/LogIn.vue";
 import SignUp from "@/components/auth/SignUp.vue";
 import UserStatusScreen from "@/components/users_screen/UserStatusScreen.vue";
+import AttestableView from "@/components/users_screen/attestable/AttestableView.vue";
 
 Vue.use(VueRouter);
 
@@ -54,9 +55,15 @@ const routes = [
       },
       {
         path: "/",
-        name: "UserStatusScreen",
         beforeEnter: ifAuthenticated,
-        component: UserStatusScreen
+        component: UserStatusScreen,
+        children: [
+          {
+            path: "/",
+            component: AttestableView,
+            name: "AttestableView"
+          }
+        ]
       }
     ]
   },
