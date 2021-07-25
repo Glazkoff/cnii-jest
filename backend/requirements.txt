@@ -13,6 +13,7 @@ Pillow
 dj-rest-auth[with_social]
 djangorestframework-simplejwt
 markdown
+graphene-django
 # django-appypod
 # django-webodt
 # django-template-engines

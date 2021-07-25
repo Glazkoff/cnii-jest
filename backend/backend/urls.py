@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from graphene_django.views import GraphQLView
 # from documents import views
 
 router = routers.DefaultRouter()
@@ -26,5 +27,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/signup/', include('dj_rest_auth.registration.urls')),
-    path('api/documents/', include('documents.urls'))
+    path('api/documents/', include('documents.urls')),
+    path('api/graphql/', GraphQLView.as_view(graphiql=True)),
 ]
