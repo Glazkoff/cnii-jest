@@ -24,9 +24,9 @@ export default {
             this.$router.push({ path: futurePath });
           }
         },
-        errors => {
+        error => {
           this.$store.commit("STOP_APP_LOADING");
-          console.log("ERROR: ", errors);
+          if (error.code != "token_not_valid") console.log("ERROR: ", error);
         }
       );
     }

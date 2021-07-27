@@ -54,7 +54,6 @@ export default new Vuex.Store({
             data
           })
             .then(resp => {
-              console.log(resp.data);
               store.commit("SET_REFRESH_TOKEN", resp.data.refresh_token);
               store.commit("SET_ACCESS_TOKEN", resp.data.access_token);
               resolve(resp.data);

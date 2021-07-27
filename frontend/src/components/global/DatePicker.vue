@@ -71,7 +71,9 @@ export default {
   watch: {
     date() {
       this.dateFormatted = this.formatDate(this.date);
-      this.$emit("update", this.dateFormatted);
+      let dateEmit = this.parseDate(this.date);
+      console.log(dateEmit);
+      this.$emit("update", dateEmit);
     }
   },
   methods: {
@@ -82,9 +84,14 @@ export default {
     },
     parseDate(date) {
       if (!date) return null;
-
-      const [day, month, year] = date.split(".");
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      console.log(date);
+      if (date.split(".").length == 3) {
+        const [day, month, year] = date.split(".");
+        console.log(date.split("."));
+        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      } else {
+        return date;
+      }
     }
   }
 };

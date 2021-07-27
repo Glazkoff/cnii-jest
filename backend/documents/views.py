@@ -32,13 +32,12 @@ def doc_test(request):
 
     doc = opendoc(os.path.join(
         MEDIA_ROOT, "template2.odt"))
-    print('!!!!!!!!!!!!!!!!!!!!!')
     print(repr(doc.body.variables.__dict__))
 
     templatePath = os.path.join(MEDIA_ROOT, "result2.odt")
     template = open(templatePath, 'rb')
     context = {
-        'title': 'TITLE'
+        'title': 'Заголовок'
     }
     result = engine.render(templatePath, **context)
 

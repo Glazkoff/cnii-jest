@@ -3,6 +3,7 @@
     <v-form ref="form" lazy-validation>
       <v-text-field
         label="Фамилия"
+        autocomplete="surname"
         v-model="$v.form.surname.$model"
         :error-messages="surnameErrors"
         @input="$v.form.surname.$touch()"
@@ -11,6 +12,7 @@
       ></v-text-field>
       <v-text-field
         label="Имя"
+        autocomplete="name"
         v-model="$v.form.name.$model"
         :error-messages="nameErrors"
         @input="$v.form.name.$touch()"
@@ -19,6 +21,7 @@
       ></v-text-field>
       <v-text-field
         label="Отчество"
+        autocomplete="patricity"
         v-model="$v.form.patricity.$model"
         :error-messages="patricityErrors"
         @input="$v.form.patricity.$touch()"
@@ -33,8 +36,14 @@
         :errors="dateErrors"
       ></DatePicker>
       <v-select
-        :items="['Мужской', 'Женский']"
+        :items="[
+          { text: 'Мужской', value: 'M' },
+          { text: 'Женский', value: 'F' }
+        ]"
+        item-text="text"
+        item-value="value"
         label="Пол"
+        autocomplete="sex"
         v-model="$v.form.sex.$model"
         :error-messages="sexErrors"
         @input="$v.form.sex.$touch()"
@@ -55,6 +64,7 @@
 <script>
 import { required } from "vuelidate/lib/validators";
 import DatePicker from "../../global/DatePicker.vue";
+import { SET_FIRST_PROFILE_PART } from "@/graphql/user_request_mutations.js";
 
 export default {
   name: "ProfileStep1",
@@ -69,8 +79,7 @@ export default {
         name: null,
         patricity: null,
         birthday: null,
-        sex: null,
-        date_of_birth: null
+        sex: null
       }
     };
   },
@@ -119,9 +128,45 @@ export default {
   },
   methods: {
     goToNextStep() {
-      let nextStep = 2;
+      const nextStep = 2;
       this.$v.form.$touch();
-      console.log("Next step: ", nextStep);
+      if (this.$v.form.$anyError) {
+        console.log("anyError");
+      } else {
+        console.log("noAnyError");
+        this.formLoading = true;
+        this.sendFirstStep()
+          .then(() => {
+            console.log("Next step: ", nextStep);
+          })
+          .finally(() => {
+            this.formLoading = false;
+          });
+      }
+    },
+    sendFirstStep() {
+      return new Promise((resolve, reject) => {
+        this.$apollo
+          .mutate({
+            mutation: SET_FIRST_PROFILE_PART,
+            variables: {
+              userId: this.$store.getters.decoded.user_id,
+              surname: this.$v.form.$model.surname,
+              name: this.$v.form.$model.name,
+              birthday: this.$v.form.$model.birthday,
+              sex: this.$v.form.$model.sex,
+              patricity: this.$v.form.$model.patricity
+            }
+          })
+          .then(res => {
+            resolve(res);
+            console.log("SEND: ", this.$v.form.$model);
+          })
+          .catch(err => {
+            reject(err);
+            console.log("ОШИБКА МУТАЦИИ: ", err);
+          });
+      });
     }
   }
 };

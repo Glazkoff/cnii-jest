@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Данные для аттестации</h1>
+    <h1 class="mb-2">Данные для аттестации</h1>
     <v-stepper v-model="stepperStatus" vertical>
       <v-stepper-step step="1" :complete="stepperStatus >= 1">
         Шаг 1. Личные данные

@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <div>UserStatusScreen</div>
+    <div>Отправка заявки пользователем</div>
     <router-view></router-view>
   </v-container>
 </template>
