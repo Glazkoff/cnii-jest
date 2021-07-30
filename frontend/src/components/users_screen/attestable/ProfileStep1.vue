@@ -14,11 +14,11 @@
         :error-messages="surnameErrors"
         @input="
           $v.form.surname.$touch();
-          sendFirstStep();
+          sendForm();
         "
         @blur="
           $v.form.surname.$touch();
-          sendFirstStep();
+          sendForm();
         "
         required
       ></v-text-field>
@@ -29,11 +29,11 @@
         :error-messages="nameErrors"
         @input="
           $v.form.name.$touch();
-          sendFirstStep();
+          sendForm();
         "
         @blur="
           $v.form.name.$touch();
-          sendFirstStep();
+          sendForm();
         "
         required
       ></v-text-field>
@@ -44,11 +44,11 @@
         :error-messages="patricityErrors"
         @input="
           $v.form.patricity.$touch();
-          sendFirstStep();
+          sendForm();
         "
         @blur="
           $v.form.patricity.$touch();
-          sendFirstStep();
+          sendForm();
         "
         required
       ></v-text-field>
@@ -57,7 +57,7 @@
         autocomplete="date_of_birth"
         @update="
           $v.form.birthday.$model = $event;
-          sendFirstStep();
+          sendForm();
         "
         :disabled="formLoading"
         :errors="dateErrors"
@@ -77,11 +77,11 @@
         :error-messages="sexErrors"
         @input="
           $v.form.sex.$touch();
-          sendFirstStep();
+          sendForm();
         "
         @blur="
           $v.form.sex.$touch();
-          sendFirstStep();
+          sendForm();
         "
       ></v-select>
     </v-form>
@@ -209,7 +209,7 @@ export default {
       this.$v.form.$touch();
       if (!this.$v.form.$anyError) {
         this.formLoading = true;
-        this.sendFirstStep()
+        this.sendForm()
           .then(() => {
             this.$emit("goToNextStep");
           })
@@ -218,7 +218,7 @@ export default {
           });
       }
     },
-    sendFirstStep() {
+    sendForm() {
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({

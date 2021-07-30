@@ -22,14 +22,16 @@ class CustomUser(models.Model):
     organization = models.CharField("Организация", max_length=150, blank=True)
     job_position = models.CharField(
         "Занимаемая должность", max_length=150, blank=True)
+    # TODO: запрашиваемая категория аттестации
+    # TODO: Заявленная сфера деятельности FK
     education = models.CharField("Образование", max_length=150, blank=True)
     home_address = models.CharField(
         "Домашний адрес", max_length=150, blank=True)
     passport = models.CharField("Данные паспорта", max_length=150, blank=True)
     passport_part1_scan = models.ImageField(verbose_name="Скан паспорта (часть 1)",
-                                                upload_to='passport_part1', blank=True)
+                                            upload_to='passport_part1', blank=True)
     passport_part2_scan = models.ImageField(verbose_name="Скан паспорта (часть 2)",
-                                                upload_to='passport_part2', blank=True)
+                                            upload_to='passport_part2', blank=True)
     email = models.EmailField("E-mail", max_length=150, blank=True)
     personal_phone = models.CharField(
         "Мобильный телефон", max_length=150, blank=True)

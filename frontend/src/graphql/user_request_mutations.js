@@ -29,3 +29,36 @@ export const SET_FIRST_PROFILE_PART = gql`
     }
   }
 `;
+
+// Мутация для отправки данных второго шага
+export const SET_SECOND_PROFILE_PART = gql`
+  mutation (
+    $userId: ID!
+    $nativeLanguage: String
+    $citizenship: String
+    $martialStatus: String
+    $organization: String
+    $jobPosition: String
+    $education: String
+  ) {
+    setSecondProfilePart(
+      userId: $userId
+      nativeLanguage: $nativeLanguage
+      citizenship: $citizenship
+      martialStatus: $martialStatus
+      organization: $organization
+      jobPosition: $jobPosition
+      education: $education
+    ) {
+      user {
+        id
+        nativeLanguage
+        citizenship
+        martialStatus
+        organization
+        jobPosition
+        education
+      }
+    }
+  }
+`;
