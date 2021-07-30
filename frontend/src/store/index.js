@@ -22,6 +22,15 @@ export default new Vuex.Store({
         return null;
       }
     },
+    user_id: state => {
+      const access_token = state.access_token;
+      if (access_token) {
+        const decoded = jwt_decode(access_token);
+        return decoded.user_id;
+      } else {
+        return null;
+      }
+    },
     isAuthenticated: state => {
       return state.access_token !== null && state.refresh_token !== null;
     }

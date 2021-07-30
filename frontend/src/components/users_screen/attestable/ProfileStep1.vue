@@ -1,13 +1,25 @@
 <template>
   <div>
-    <v-form ref="form" lazy-validation>
+    <v-progress-circular
+      indeterminate
+      color="primary"
+      v-if="this.$apollo.queries.user.loading"
+    >
+    </v-progress-circular>
+    <v-form ref="form" lazy-validation v-else>
       <v-text-field
         label="Фамилия"
         autocomplete="surname"
         v-model="$v.form.surname.$model"
         :error-messages="surnameErrors"
-        @input="$v.form.surname.$touch()"
-        @blur="$v.form.surname.$touch()"
+        @input="
+          $v.form.surname.$touch();
+          sendFirstStep();
+        "
+        @blur="
+          $v.form.surname.$touch();
+          sendFirstStep();
+        "
         required
       ></v-text-field>
       <v-text-field
@@ -15,8 +27,14 @@
         autocomplete="name"
         v-model="$v.form.name.$model"
         :error-messages="nameErrors"
-        @input="$v.form.name.$touch()"
-        @blur="$v.form.name.$touch()"
+        @input="
+          $v.form.name.$touch();
+          sendFirstStep();
+        "
+        @blur="
+          $v.form.name.$touch();
+          sendFirstStep();
+        "
         required
       ></v-text-field>
       <v-text-field
@@ -24,16 +42,27 @@
         autocomplete="patricity"
         v-model="$v.form.patricity.$model"
         :error-messages="patricityErrors"
-        @input="$v.form.patricity.$touch()"
-        @blur="$v.form.patricity.$touch()"
+        @input="
+          $v.form.patricity.$touch();
+          sendFirstStep();
+        "
+        @blur="
+          $v.form.patricity.$touch();
+          sendFirstStep();
+        "
         required
       ></v-text-field>
       <DatePicker
         label="Дата рождения"
         autocomplete="date_of_birth"
-        @update="$v.form.birthday.$model = $event"
+        @update="
+          $v.form.birthday.$model = $event;
+          sendFirstStep();
+        "
         :disabled="formLoading"
         :errors="dateErrors"
+        :predefined="predefinedBirthday"
+        :max="new Date().toISOString().slice(0, 10)"
       ></DatePicker>
       <v-select
         :items="[
@@ -46,8 +75,14 @@
         autocomplete="sex"
         v-model="$v.form.sex.$model"
         :error-messages="sexErrors"
-        @input="$v.form.sex.$touch()"
-        @blur="$v.form.sex.$touch()"
+        @input="
+          $v.form.sex.$touch();
+          sendFirstStep();
+        "
+        @blur="
+          $v.form.sex.$touch();
+          sendFirstStep();
+        "
       ></v-select>
     </v-form>
     <v-btn
@@ -55,6 +90,7 @@
       color="primary"
       :disabled="$v.form.$anyError"
       @click="goToNextStep"
+      v-if="!this.$apollo.queries.user.loading"
     >
       Далее
     </v-btn>
@@ -65,6 +101,7 @@
 import { required } from "vuelidate/lib/validators";
 import DatePicker from "../../global/DatePicker.vue";
 import { SET_FIRST_PROFILE_PART } from "@/graphql/user_request_mutations.js";
+import { GET_FIRST_PROFILE_PART } from "@/graphql/user_request_queries.js";
 
 export default {
   name: "ProfileStep1",
@@ -82,6 +119,37 @@ export default {
         sex: null
       }
     };
+  },
+  apollo: {
+    user: {
+      query: GET_FIRST_PROFILE_PART,
+      variables() {
+        return {
+          userId: this.$store.getters.user_id
+        };
+      }
+    }
+  },
+  watch: {
+    user: function (val) {
+      if (val) {
+        if (val.surname) {
+          this.$v.form.$model.surname = val.surname;
+        }
+        if (val.name) {
+          this.$v.form.$model.name = val.name;
+        }
+        if (val.patricity) {
+          this.$v.form.$model.patricity = val.patricity;
+        }
+        if (val.sex) {
+          this.$v.form.$model.sex = val.sex;
+        }
+        if (val.birthday) {
+          this.$v.form.$model.birthday = val.birthday;
+        }
+      }
+    }
   },
   validations: {
     form: {
@@ -109,7 +177,6 @@ export default {
     patricityErrors() {
       const errors = [];
       if (!this.$v.form.patricity.$dirty) return errors;
-      // !this.$v.form.patricity.required && errors.push("Поле обязательно");
       return errors;
     },
     sexErrors() {
@@ -124,20 +191,27 @@ export default {
       !this.$v.form.birthday.required &&
         errors.push("Поле 'Дата рождения' обязательно");
       return errors;
+    },
+    predefinedBirthday() {
+      if (this.user) {
+        if (this.user.birthday) {
+          return this.user.birthday;
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
     }
   },
   methods: {
     goToNextStep() {
-      const nextStep = 2;
       this.$v.form.$touch();
-      if (this.$v.form.$anyError) {
-        console.log("anyError");
-      } else {
-        console.log("noAnyError");
+      if (!this.$v.form.$anyError) {
         this.formLoading = true;
         this.sendFirstStep()
           .then(() => {
-            console.log("Next step: ", nextStep);
+            this.$emit("goToNextStep");
           })
           .finally(() => {
             this.formLoading = false;
@@ -156,15 +230,35 @@ export default {
               birthday: this.$v.form.$model.birthday,
               sex: this.$v.form.$model.sex,
               patricity: this.$v.form.$model.patricity
+            },
+            update: (cache, { data: { setFirstProfilePart } }) => {
+              const data = cache.readQuery({
+                query: GET_FIRST_PROFILE_PART,
+                variables: {
+                  userId: this.$store.getters.user_id
+                }
+              });
+
+              data.user.surname = setFirstProfilePart.user.surname;
+              data.user.name = setFirstProfilePart.user.name;
+              data.user.patricity = setFirstProfilePart.user.patricity;
+              data.user.birthday = setFirstProfilePart.user.birthday;
+              data.user.sex = setFirstProfilePart.user.sex;
+
+              cache.writeQuery({
+                query: GET_FIRST_PROFILE_PART,
+                variables: {
+                  userId: this.$store.getters.user_id
+                },
+                data
+              });
             }
           })
           .then(res => {
             resolve(res);
-            console.log("SEND: ", this.$v.form.$model);
           })
           .catch(err => {
             reject(err);
-            console.log("ОШИБКА МУТАЦИИ: ", err);
           });
       });
     }

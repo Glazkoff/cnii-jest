@@ -34,6 +34,8 @@
       no-title
       @input="menu = false"
       color="colorOfSea"
+      :max="max"
+      :min="min"
     ></v-date-picker>
   </v-menu>
 </template>
@@ -44,7 +46,7 @@ import { required } from "vuelidate/lib/validators";
 export default {
   mixins: [validationMixin],
   name: "DatePicker",
-  props: ["label", "value", "autocomplete", "errors"],
+  props: ["label", "autocomplete", "errors", "predefined", "max", "min"],
   validations: {
     dateFormatted: {
       required
@@ -52,7 +54,7 @@ export default {
   },
   data() {
     return {
-      date: null,
+      date: this.predefined,
       dateFormatted: null,
       menu: false
     };
@@ -69,11 +71,21 @@ export default {
     // }
   },
   watch: {
-    date() {
-      this.dateFormatted = this.formatDate(this.date);
-      let dateEmit = this.parseDate(this.date);
-      console.log(dateEmit);
+    date(val) {
+      this.dateFormatted = this.formatDate(val);
+      let dateEmit = this.parseDate(val);
       this.$emit("update", dateEmit);
+    },
+    predefined(val) {
+      if (val) {
+        this.date = val;
+        this.$v.dateFormatted.$model = this.formatDate(val);
+      }
+    }
+  },
+  mounted() {
+    if (this.predefined) {
+      this.$v.dateFormatted.$model = this.formatDate(this.predefined);
     }
   },
   methods: {
@@ -84,10 +96,8 @@ export default {
     },
     parseDate(date) {
       if (!date) return null;
-      console.log(date);
       if (date.split(".").length == 3) {
         const [day, month, year] = date.split(".");
-        console.log(date.split("."));
         return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
       } else {
         return date;

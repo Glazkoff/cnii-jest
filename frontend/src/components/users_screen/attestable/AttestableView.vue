@@ -7,7 +7,7 @@
       </v-stepper-step>
 
       <v-stepper-content step="1">
-        <ProfileStep1></ProfileStep1>
+        <ProfileStep1 @goToNextStep="stepperStatus = 2"></ProfileStep1>
       </v-stepper-content>
 
       <v-stepper-step step="2" :complete="stepperStatus >= 2">
