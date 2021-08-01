@@ -7,6 +7,24 @@
     >
     </v-progress-circular>
     <v-form ref="form" lazy-validation v-else></v-form>
+    <v-btn
+      class="mt-2"
+      color="primary"
+      :disabled="$v.form.$anyError"
+      @click="goToNextStep"
+      v-if="!this.$apollo.queries.user.loading"
+    >
+      Далее
+    </v-btn>
+    <v-btn
+      text
+      class="mt-2"
+      :disabled="$v.form.$anyError"
+      @click="goToPrevStep"
+      v-if="!this.$apollo.queries.user.loading"
+    >
+      Назад
+    </v-btn>
   </div>
 </template>
 
@@ -94,6 +112,16 @@ export default {
             this.formLoading = false;
           });
       }
+    },
+    goToPrevStep() {
+      this.formLoading = true;
+      this.sendForm()
+        .then(() => {
+          this.$emit("goToPrevStep");
+        })
+        .finally(() => {
+          this.formLoading = false;
+        });
     },
     sendForm() {
       // TODO: add sendForm

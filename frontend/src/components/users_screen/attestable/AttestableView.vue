@@ -27,8 +27,6 @@
           @goToPrevStep="stepperStatus = 2"
           @goToNextStep="stepperStatus = 4"
         ></ProfileStep3>
-        <v-btn color="primary" @click="stepperStatus = 1"> Далее </v-btn>
-        <v-btn text @click="stepperStatus = 2"> Назад </v-btn>
       </v-stepper-content>
 
       <v-stepper-step step="4" :complete="stepperStatus >= 4">

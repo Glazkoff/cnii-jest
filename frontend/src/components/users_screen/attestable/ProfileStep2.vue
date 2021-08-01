@@ -110,7 +110,6 @@
     <v-btn
       text
       class="mt-2"
-      color="primary"
       :disabled="$v.form.$anyError"
       @click="goToPrevStep"
       v-if="!this.$apollo.queries.user.loading"
@@ -121,7 +120,6 @@
 </template>
 
 <script>
-// TODO:
 // - native_language Родной язык
 // - citizenship Гражданство
 // - martial_status Семейное положение

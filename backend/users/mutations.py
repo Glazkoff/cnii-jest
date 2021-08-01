@@ -71,3 +71,23 @@ class SetSecondProfilePartMutation(graphene.Mutation):
             return SetSecondProfilePartMutation(user=custom_user[0])
         except (User.DoesNotExist,):
             return SetSecondProfilePartMutation(user=None)
+
+
+class SetThirdProfilePartMutation(graphene.Mutation):
+    class Arguments:
+        user_id = graphene.ID(required=True)
+        passport = graphene.String()
+
+    user = graphene.Field(CustomUserType)
+
+    @classmethod
+    def mutate(cls, root, info, user_id, passport=None):
+            try:
+                user = User.objects.get(pk=user_id)
+                custom_user = CustomUser.objects.get_or_create(user=user)
+                if passport is not None:
+                    custom_user[0].passport = passport
+                custom_user[0].save()
+                return SetThirdProfilePartMutation(user=custom_user[0])
+            except (User.DoesNotExist,):
+                return SetThirdProfilePartMutation(user=None)
