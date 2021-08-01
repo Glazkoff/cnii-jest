@@ -100,11 +100,33 @@ export default {
         if (val.passport) {
           this.$v.form.$model.passport = val.passport;
         }
-        if (val.passport_part1_scan) {
-          this.$v.form.$model.passport_part1_scan = val.passportPart1Scan;
+        if (val.passportPart1Scan) {
+          this.$http({
+            url: "/media/" + val.passportPart1Scan,
+            method: "GET",
+            responseType: "blob"
+          }).then(response => {
+            this.$v.form.$model.passport_part1_scan = new File(
+              [response.data],
+              val.passportPart1Scan.split("/")[
+                val.passportPart1Scan.split("/").length - 1
+              ]
+            );
+          });
         }
-        if (val.passport_part2_scan) {
-          this.$v.form.$model.passport_part2_scan = val.passportPart2Scan;
+        if (val.passportPart2Scan) {
+          this.$http({
+            url: "/media/" + val.passportPart1Scan,
+            method: "GET",
+            responseType: "blob"
+          }).then(response => {
+            this.$v.form.$model.passport_part2_scan = new File(
+              [response.data],
+              val.passportPart2Scan.split("/")[
+                val.passportPart2Scan.split("/").length - 1
+              ]
+            );
+          });
         }
       }
     }
@@ -171,7 +193,9 @@ export default {
             mutation: SET_THIRD_PROFILE_PART,
             variables: {
               userId: this.$store.getters.decoded.user_id,
-              passport: this.$v.form.$model.passport
+              passport: this.$v.form.$model.passport,
+              passportPart1Scan: this.$v.form.$model.passport_part1_scan,
+              passportPart2Scan: this.$v.form.$model.passport_part2_scan
             },
             update: (cache, { data: { setThirdProfilePart } }) => {
               const data = cache.readQuery({
