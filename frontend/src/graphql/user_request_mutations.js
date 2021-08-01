@@ -65,11 +65,23 @@ export const SET_SECOND_PROFILE_PART = gql`
 
 // Мутация для отправки данных третьего шага
 export const SET_THIRD_PROFILE_PART = gql`
-  mutation ($userId: ID!, $passport: String) {
-    setThirdProfilePart(userId: $userId, passport: $passport) {
+  mutation (
+    $userId: ID!
+    $passport: String
+    $passportPart1Scan: Upload
+    $passportPart2Scan: Upload
+  ) {
+    setThirdProfilePart(
+      userId: $userId
+      passport: $passport
+      passportPart1Scan: $passportPart1Scan
+      passportPart2Scan: $passportPart2Scan
+    ) {
       user {
         id
         passport
+        passportPart1Scan
+        passportPart2Scan
       }
     }
   }

@@ -1,7 +1,12 @@
+from transliterate import translit
+from django.core.files.base import ContentFile, File
+import os
+import datetime
 import graphene
 from django.contrib.auth.models import User
 from .models import CustomUser
 from .types import CustomUserType
+from graphene_file_upload.scalars import Upload
 
 
 class SetFirstProfilePartMutation(graphene.Mutation):
@@ -77,17 +82,44 @@ class SetThirdProfilePartMutation(graphene.Mutation):
     class Arguments:
         user_id = graphene.ID(required=True)
         passport = graphene.String()
+        passport_part1_scan = Upload()
+        passport_part2_scan = Upload()
 
     user = graphene.Field(CustomUserType)
 
     @classmethod
-    def mutate(cls, root, info, user_id, passport=None):
-            try:
-                user = User.objects.get(pk=user_id)
-                custom_user = CustomUser.objects.get_or_create(user=user)
-                if passport is not None:
-                    custom_user[0].passport = passport
-                custom_user[0].save()
-                return SetThirdProfilePartMutation(user=custom_user[0])
-            except (User.DoesNotExist,):
-                return SetThirdProfilePartMutation(user=None)
+    def mutate(cls, root, info, user_id, passport=None, passport_part1_scan=None, passport_part2_scan=None):
+        try:
+            user = User.objects.get(pk=user_id)
+            custom_user = CustomUser.objects.get_or_create(user=user)
+            if passport is not None:
+                custom_user[0].passport = passport
+            now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+            if passport_part1_scan is not None:
+                filename, extension = os.path.splitext(
+                    passport_part1_scan.name)
+                surname = translit(
+                    custom_user[0].surname, language_code='ru', reversed=True)
+                name = translit(
+                    custom_user[0].name, language_code='ru', reversed=True)
+                patricity = translit(
+                    custom_user[0].patricity, language_code='ru', reversed=True)
+                new_filename = f"{surname}_{name}_{patricity}_passport_part1_{now}{extension}"
+                custom_user[0].passport_part1_scan.save(
+                    new_filename, File(passport_part1_scan))
+            if passport_part2_scan is not None:
+                filename, extension = os.path.splitext(
+                    passport_part2_scan.name)
+                surname = translit(
+                    custom_user[0].surname, language_code='ru', reversed=True)
+                name = translit(
+                    custom_user[0].name, language_code='ru', reversed=True)
+                patricity = translit(
+                    custom_user[0].patricity, language_code='ru', reversed=True)
+                new_filename = f"{surname}_{name}_{patricity}_passport_part2_{now}{extension}"
+                custom_user[0].passport_part2_scan.save(
+                    new_filename, File(passport_part2_scan))
+            custom_user[0].save()
+            return SetThirdProfilePartMutation(user=custom_user[0])
+        except (User.DoesNotExist,):
+            return SetThirdProfilePartMutation(user=None)
