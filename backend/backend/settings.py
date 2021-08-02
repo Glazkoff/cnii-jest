@@ -83,8 +83,12 @@ LOCAL_APPS = [
     'users'
 ]
 
+OPTIMIZATION = [
+    'django_cleanup.apps.CleanupConfig',
+]
+
 INSTALLED_APPS = ADMIN_INTERFACE_STYLE + \
-    DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+    DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + OPTIMIZATION
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -16,6 +16,7 @@ markdown
 graphene-django
 graphene-file-upload
 transliterate
+django-cleanup
 # django-appypod
 # django-webodt
 # django-template-engines
