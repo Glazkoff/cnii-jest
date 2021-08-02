@@ -30,6 +30,8 @@
         prepend-icon="mdi-camera"
         :error-messages="passportPart1ScanErrors"
         v-model="$v.form.passport_part1_scan.$model"
+        @input="sendForm()"
+        @blur="sendForm()"
       ></v-file-input>
       <v-file-input
         chips
@@ -39,6 +41,8 @@
         prepend-icon="mdi-camera"
         :error-messages="passportPart2ScanErrors"
         v-model="$v.form.passport_part2_scan.$model"
+        @input="sendForm()"
+        @blur="sendForm()"
       ></v-file-input>
     </v-form>
     <v-btn
