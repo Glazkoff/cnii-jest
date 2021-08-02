@@ -186,7 +186,6 @@ export default {
         });
     },
     sendForm() {
-      // TODO: add sendForm
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({

@@ -123,3 +123,66 @@ class SetThirdProfilePartMutation(graphene.Mutation):
             return SetThirdProfilePartMutation(user=custom_user[0])
         except (User.DoesNotExist,):
             return SetThirdProfilePartMutation(user=None)
+
+
+class SetFourthProfilePartMutation(graphene.Mutation):
+    class Arguments:
+        user_id = graphene.ID(required=True)
+        home_address = graphene.String()
+        personal_phone = graphene.String()
+        home_phone = graphene.String()
+        work_phone = graphene.String()
+
+    user = graphene.Field(CustomUserType)
+
+    @classmethod
+    def mutate(cls, root, info, user_id, home_address=None, personal_phone=None, home_phone=None, work_phone=None,):
+        try:
+            user = User.objects.get(pk=user_id)
+            custom_user = CustomUser.objects.get_or_create(user=user)
+            if home_address is not None:
+                custom_user[0].home_address = home_address
+            if personal_phone is not None:
+                custom_user[0].personal_phone = personal_phone
+            if home_phone is not None:
+                custom_user[0].home_phone = home_phone
+            if work_phone is not None:
+                custom_user[0].work_phone = work_phone
+            custom_user[0].save()
+
+            return SetFourthProfilePartMutation(user=custom_user[0])
+        except (User.DoesNotExist,):
+            return SetFourthProfilePartMutation(user=None)
+
+
+class SetFifthProfilePartMutation(graphene.Mutation):
+    class Arguments:
+        user_id = graphene.ID(required=True)
+        work_experience_full_years = graphene.Int()
+        work_experience_current_job = graphene.Int()
+        awards = graphene.String()
+        training = graphene.String()
+        organization_membership = graphene.String()
+
+    user = graphene.Field(CustomUserType)
+
+    @classmethod
+    def mutate(cls, root, info, user_id, work_experience_full_years=None, work_experience_current_job=None, awards=None, training=None, organization_membership=None):
+        try:
+            user = User.objects.get(pk=user_id)
+            custom_user = CustomUser.objects.get_or_create(user=user)
+            if work_experience_full_years is not None:
+                custom_user[0].work_experience_full_years = work_experience_full_years
+            if work_experience_current_job is not None:
+                custom_user[0].work_experience_current_job = work_experience_current_job
+            if awards is not None:
+                custom_user[0].awards = awards
+            if training is not None:
+                custom_user[0].training = training
+            if organization_membership is not None:
+                custom_user[0].organization_membership = organization_membership
+            custom_user[0].save()
+
+            return SetFifthProfilePartMutation(user=custom_user[0])
+        except (User.DoesNotExist,):
+            return SetFifthProfilePartMutation(user=None)

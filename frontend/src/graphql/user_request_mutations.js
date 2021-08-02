@@ -86,3 +86,29 @@ export const SET_THIRD_PROFILE_PART = gql`
     }
   }
 `;
+
+// Мутация для отправки данных четвёртого шага
+export const SET_FOURTH_PROFILE_PART = gql`
+  mutation (
+    $userId: ID!
+    $homeAddress: String
+    $personalPhone: String
+    $homePhone: String
+    $workPhone: String
+  ) {
+    setFourthProfilePart(
+      userId: $userId
+      homeAddress: $homeAddress
+      personalPhone: $personalPhone
+      homePhone: $homePhone
+      workPhone: $workPhone
+    ) {
+      user {
+        homeAddress
+        personalPhone
+        homePhone
+        workPhone
+      }
+    }
+  }
+`;

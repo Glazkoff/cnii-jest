@@ -1,7 +1,7 @@
 import graphene
 from .models import CustomUser
 from .types import CustomUserType
-from .mutations import SetFirstProfilePartMutation, SetSecondProfilePartMutation, SetThirdProfilePartMutation
+from .mutations import SetFirstProfilePartMutation, SetSecondProfilePartMutation, SetThirdProfilePartMutation, SetFourthProfilePartMutation, SetFifthProfilePartMutation
 
 
 class Query(graphene.ObjectType):
@@ -19,6 +19,9 @@ class Mutation(graphene.ObjectType):
     set_first_profile_part = SetFirstProfilePartMutation.Field()
     set_second_profile_part = SetSecondProfilePartMutation.Field()
     set_third_profile_part = SetThirdProfilePartMutation.Field()
+    set_fourth_profile_part = SetFourthProfilePartMutation.Field()
+    set_fifth_profile_part = SetFifthProfilePartMutation.Field()
+
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
