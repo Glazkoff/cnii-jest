@@ -10,6 +10,7 @@ export const GET_FIRST_PROFILE_PART = gql`
       patricity
       birthday
       sex
+      photo
     }
   }
 `;

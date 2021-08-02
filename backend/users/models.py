@@ -14,6 +14,8 @@ class CustomUser(models.Model):
     birthday = models.DateField("Дата рождения", blank=True, null=True)
     sex = models.CharField(verbose_name="Пол", max_length=1,
                            choices=SEX_CHOICES, blank=True)
+    photo = models.ImageField(verbose_name="Фото",
+                              upload_to='photo', blank=True)
     native_language = models.CharField(
         "Родной язык", max_length=150, blank=True)
     citizenship = models.CharField("Гражданство", max_length=150, blank=True)
@@ -47,6 +49,8 @@ class CustomUser(models.Model):
     training = models.TextField("Повышение квалификации", blank=True)
     organization_membership = models.TextField(
         "Членство в организациях", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.surname + " " + self.name)
@@ -56,3 +60,37 @@ class CustomUser(models.Model):
         managed = True
         verbose_name = 'Пользователь системы'
         verbose_name_plural = 'Пользователи системы'
+
+
+class Request(models.Model):
+    """Заявка"""
+    STATUS_CHOICES = (("step_1", "Шаг 1"), ("step_2", "Шаг 2"),
+                      ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
+    request_number = models.CharField(
+        verbose_name="Номер заявки", max_length=10)
+    user = models.ForeignKey(
+        User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    status = models.CharField(verbose_name="Статус заявки", max_length=9,
+                              choices=STATUS_CHOICES)
+    created_at = models.DateTimeField(
+        verbose_name="Когда создана", auto_now_add=True)
+    updated_at = models.DateTimeField(
+        verbose_name="Когда обновлена последний раз", auto_now=True)
+
+    def request_number(self):
+        additional_nulls = ""
+        if self.id < 10:
+            additional_nulls += "00"
+        elif self.id < 100:
+            additional_nulls += "0"
+        return "06-10-"+additional_nulls+str(self.id)
+    request_number.short_description = "Номер заявки"
+
+    def __str__(self):
+        return str(f"Заявка #{self.id}")
+
+    class Meta:
+        # db_table = 'CustomUser'
+        managed = True
+        verbose_name = 'Заявка на аттестацию'
+        verbose_name_plural = 'Заявки на аттестацию'

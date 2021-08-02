@@ -6,7 +6,92 @@
       v-if="this.$apollo.queries.user.loading"
     >
     </v-progress-circular>
-    <v-form ref="form" lazy-validation v-else></v-form>
+    <v-form ref="form" lazy-validation v-else>
+      <v-text-field
+        label="Стаж полных лет"
+        v-model="$v.form.work_experience_full_years.$model"
+        :error-messages="workExperienceFullYearsErrors"
+        @input="
+          $v.form.work_experience_full_years.$touch();
+          sendForm();
+        "
+        @blur="
+          $v.form.work_experience_full_years.$touch();
+          sendForm();
+        "
+        type="number"
+        required
+      ></v-text-field>
+      <v-text-field
+        label="Стаж настоящей должности"
+        v-model="$v.form.work_experience_current_job.$model"
+        :error-messages="workExperienceCurrentJobErrors"
+        @input="
+          $v.form.work_experience_current_job.$touch();
+          sendForm();
+        "
+        @blur="
+          $v.form.work_experience_current_job.$touch();
+          sendForm();
+        "
+        type="number"
+        required
+      ></v-text-field>
+      <v-textarea
+        label="Наличие наград"
+        v-model="$v.form.awards.$model"
+        :error-messages="awardsErrors"
+        @input="
+          $v.form.awards.$touch();
+          sendForm();
+        "
+        @blur="
+          $v.form.awards.$touch();
+          sendForm();
+        "
+        hint="Опишите ваш список наград"
+        auto-grow
+        rows="2"
+        class="mb-2"
+        required
+      ></v-textarea>
+      <v-textarea
+        label="Повышение квалификации"
+        v-model="$v.form.training.$model"
+        :error-messages="trainingErrors"
+        @input="
+          $v.form.training.$touch();
+          sendForm();
+        "
+        @blur="
+          $v.form.training.$touch();
+          sendForm();
+        "
+        hint="Опишите ваше повышение квалификации"
+        auto-grow
+        rows="2"
+        class="mb-2"
+        required
+      ></v-textarea>
+      <v-textarea
+        label="Членство в организациях"
+        v-model="$v.form.organization_membership.$model"
+        :error-messages="organizationMembershipErrors"
+        @input="
+          $v.form.organization_membership.$touch();
+          sendForm();
+        "
+        @blur="
+          $v.form.organization_membership.$touch();
+          sendForm();
+        "
+        hint="Опишите ваше членство в организациях"
+        auto-grow
+        rows="2"
+        class="mb-2"
+        required
+      ></v-textarea>
+    </v-form>
     <v-btn
       class="mt-2"
       color="primary"
@@ -14,7 +99,7 @@
       @click="goToNextStep"
       v-if="!this.$apollo.queries.user.loading"
     >
-      Далее
+      Отправить
     </v-btn>
     <v-btn
       text
@@ -37,6 +122,7 @@
 // - organization_membership Членство в организациях
 
 import { required } from "vuelidate/lib/validators";
+import { SET_FIFTH_PROFILE_PART } from "@/graphql/user_request_mutations.js";
 import { GET_FIFTH_PROFILE_PART } from "@/graphql/user_request_queries.js";
 
 export default {
@@ -66,13 +152,13 @@ export default {
   watch: {
     user: function (val) {
       if (val) {
-        if (val.work_experience_full_years) {
+        if (val.workExperienceFullYears) {
           this.$v.form.$model.work_experience_full_years =
-            val.work_experience_full_years;
+            val.workExperienceFullYears;
         }
-        if (val.work_experience_current_job) {
+        if (val.workExperienceCurrentJob) {
           this.$v.form.$model.work_experience_current_job =
-            val.work_experience_current_job;
+            val.workExperienceCurrentJob;
         }
         if (val.awards) {
           this.$v.form.$model.awards = val.awards;
@@ -80,7 +166,7 @@ export default {
         if (val.training) {
           this.$v.form.$model.training = val.training;
         }
-        if (val.organization_membership) {
+        if (val.organizationMembership) {
           this.$v.form.$model.organization_membership =
             val.organizationMembership;
         }
@@ -97,7 +183,41 @@ export default {
     }
   },
   computed: {
-    // TODO: add computed errors
+    workExperienceFullYearsErrors() {
+      const errors = [];
+      if (!this.$v.form.work_experience_full_years.$dirty) return errors;
+      !this.$v.form.work_experience_full_years.required &&
+        errors.push("Поле 'Стаж полных лет' обязательно!");
+      return errors;
+    },
+    workExperienceCurrentJobErrors() {
+      const errors = [];
+      if (!this.$v.form.work_experience_current_job.$dirty) return errors;
+      !this.$v.form.work_experience_current_job.required &&
+        errors.push("Поле 'Стаж настоящей должности' обязательно!");
+      return errors;
+    },
+    awardsErrors() {
+      const errors = [];
+      if (!this.$v.form.awards.$dirty) return errors;
+      !this.$v.form.awards.required &&
+        errors.push("Поле 'Наличие наград' обязательно!");
+      return errors;
+    },
+    trainingErrors() {
+      const errors = [];
+      if (!this.$v.form.training.$dirty) return errors;
+      !this.$v.form.training.required &&
+        errors.push("Поле 'Повышение квалификации' обязательно!");
+      return errors;
+    },
+    organizationMembershipErrors() {
+      const errors = [];
+      if (!this.$v.form.organization_membership.$dirty) return errors;
+      !this.$v.form.organization_membership.required &&
+        errors.push("Поле 'Членство в организациях' обязательно!");
+      return errors;
+    }
   },
   methods: {
     goToNextStep() {
@@ -124,7 +244,54 @@ export default {
         });
     },
     sendForm() {
-      // TODO: add sendForm
+      return new Promise((resolve, reject) => {
+        this.$apollo
+          .mutate({
+            mutation: SET_FIFTH_PROFILE_PART,
+            variables: {
+              userId: this.$store.getters.decoded.user_id,
+              workExperienceFullYears:
+                this.$v.form.$model.work_experience_full_years,
+              workExperienceCurrentJob:
+                this.$v.form.$model.work_experience_current_job,
+              awards: this.$v.form.$model.awards,
+              training: this.$v.form.$model.training,
+              organizationMembership:
+                this.$v.form.$model.organization_membership
+            },
+            update: (cache, { data: { setFifthProfilePart } }) => {
+              const data = cache.readQuery({
+                query: GET_FIFTH_PROFILE_PART,
+                variables: {
+                  userId: this.$store.getters.user_id
+                }
+              });
+
+              data.user.workExperienceFullYears =
+                setFifthProfilePart.user.workExperienceFullYears;
+              data.user.workExperienceCurrentJob =
+                setFifthProfilePart.user.workExperienceCurrentJob;
+              data.user.awards = setFifthProfilePart.user.awards;
+              data.user.training = setFifthProfilePart.user.training;
+              data.user.organizationMembership =
+                setFifthProfilePart.user.organizationMembership;
+
+              cache.writeQuery({
+                query: GET_FIFTH_PROFILE_PART,
+                variables: {
+                  userId: this.$store.getters.user_id
+                },
+                data
+              });
+            }
+          })
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err);
+          });
+      });
     }
   }
 };

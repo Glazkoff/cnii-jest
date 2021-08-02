@@ -84,6 +84,23 @@
           sendForm();
         "
       ></v-select>
+      <v-file-input
+        chips
+        accept="image/png, image/jpeg, image/bmp"
+        placeholder="Прикрепите ваше фото"
+        label="Ваше фото"
+        prepend-icon="mdi-camera"
+        :error-messages="photoErrors"
+        v-model="$v.form.photo.$model"
+        @input="
+          $v.form.photo.$touch();
+          sendForm();
+        "
+        @blur="
+          $v.form.photo.$touch();
+          sendForm();
+        "
+      ></v-file-input>
     </v-form>
     <v-btn
       class="mt-2"
@@ -148,6 +165,18 @@ export default {
         if (val.birthday) {
           this.$v.form.$model.birthday = val.birthday;
         }
+        if (val.photo) {
+          this.$http({
+            url: "/media/" + val.photo,
+            method: "GET",
+            responseType: "blob"
+          }).then(response => {
+            this.$v.form.$model.photo = new File(
+              [response.data],
+              val.photo.split("/")[val.photo.split("/").length - 1]
+            );
+          });
+        }
       }
     }
   },
@@ -157,7 +186,8 @@ export default {
       name: { required },
       patricity: {},
       birthday: { required },
-      sex: { required }
+      sex: { required },
+      photo: { required }
     }
   },
   computed: {
@@ -190,6 +220,12 @@ export default {
       if (!this.$v.form.birthday.$dirty) return errors;
       !this.$v.form.birthday.required &&
         errors.push("Поле 'Дата рождения' обязательно");
+      return errors;
+    },
+    photoErrors() {
+      const errors = [];
+      if (!this.$v.form.photo.$dirty) return errors;
+      !this.$v.form.photo.required && errors.push("Поле 'Фото' обязательно");
       return errors;
     },
     predefinedBirthday() {
@@ -229,7 +265,8 @@ export default {
               name: this.$v.form.$model.name,
               birthday: this.$v.form.$model.birthday,
               sex: this.$v.form.$model.sex,
-              patricity: this.$v.form.$model.patricity
+              patricity: this.$v.form.$model.patricity,
+              photo: this.$v.form.$model.photo
             },
             update: (cache, { data: { setFirstProfilePart } }) => {
               const data = cache.readQuery({

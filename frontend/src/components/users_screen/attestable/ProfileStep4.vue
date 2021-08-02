@@ -224,11 +224,10 @@ export default {
                 }
               });
 
-              data.user.home_address = setFourthProfilePart.user.home_address;
-              data.user.personal_phone =
-                setFourthProfilePart.user.personal_phone;
-              data.user.home_phone = setFourthProfilePart.user.home_phone;
-              data.user.work_phone = setFourthProfilePart.user.work_phone;
+              data.user.homeAddress = setFourthProfilePart.user.homeAddress;
+              data.user.personalPhone = setFourthProfilePart.user.personalPhone;
+              data.user.homePhone = setFourthProfilePart.user.homePhone;
+              data.user.workPhone = setFourthProfilePart.user.workPhone;
 
               cache.writeQuery({
                 query: GET_FOURTH_PROFILE_PART,

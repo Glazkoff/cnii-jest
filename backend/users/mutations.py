@@ -4,8 +4,8 @@ import os
 import datetime
 import graphene
 from django.contrib.auth.models import User
-from .models import CustomUser
-from .types import CustomUserType
+from .models import CustomUser, Request
+from .types import CustomUserType, RequestType
 from graphene_file_upload.scalars import Upload
 
 
@@ -17,11 +17,12 @@ class SetFirstProfilePartMutation(graphene.Mutation):
         patricity = graphene.String()
         birthday = graphene.Date()
         sex = graphene.String()
+        photo = Upload()
 
     user = graphene.Field(CustomUserType)
 
     @classmethod
-    def mutate(cls, root, info, user_id, surname=None, name=None, birthday=None, sex=None, patricity=None):
+    def mutate(cls, root, info, user_id, surname=None, name=None, birthday=None, sex=None, patricity=None, photo=None):
         try:
             user = User.objects.get(pk=user_id)
             custom_user = CustomUser.objects.get_or_create(user=user)
@@ -35,6 +36,19 @@ class SetFirstProfilePartMutation(graphene.Mutation):
                 custom_user[0].sex = sex
             if patricity is not None:
                 custom_user[0].patricity = patricity
+            if photo is not None:
+                now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+                filename, extension = os.path.splitext(
+                    photo.name)
+                surname = translit(
+                    custom_user[0].surname, language_code='ru', reversed=True)
+                name = translit(
+                    custom_user[0].name, language_code='ru', reversed=True)
+                patricity = translit(
+                    custom_user[0].patricity, language_code='ru', reversed=True)
+                new_filename = f"{surname}_{name}_{patricity}_photo_{now}{extension}"
+                custom_user[0].photo.save(
+                    new_filename, File(photo))
             custom_user[0].save()
 
             return SetFirstProfilePartMutation(user=custom_user[0])
@@ -186,3 +200,22 @@ class SetFifthProfilePartMutation(graphene.Mutation):
             return SetFifthProfilePartMutation(user=custom_user[0])
         except (User.DoesNotExist,):
             return SetFifthProfilePartMutation(user=None)
+
+
+class UpdateRequestStatusMutation(graphene.Mutation):
+    class Arguments:
+        user_id = graphene.ID(required=True)
+        request_id = graphene.ID()
+        status = graphene.String()
+
+    request = graphene.Field(RequestType)
+
+    @classmethod
+    def mutate(cls, root, info, request_id, status):
+        try:
+            request = Request.objects.get(pk=request_id)
+            request.status = status
+            request.save()
+            return UpdateRequestStatusMutation(request=request)
+        except:
+            return UpdateRequestStatusMutation(request=None)

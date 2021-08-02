@@ -45,10 +45,14 @@
       <v-stepper-content step="5">
         <ProfileStep5
           @goToPrevStep="stepperStatus = 4"
-          @goToNextStep="stepperStatus = 1"
+          @goToNextStep="confirmationDialog = true"
         ></ProfileStep5>
       </v-stepper-content>
     </v-stepper>
+    <SendingConfirmationDialog
+      :dialog="confirmationDialog"
+      @close="confirmationDialog = false"
+    ></SendingConfirmationDialog>
   </div>
 </template>
 
@@ -58,6 +62,7 @@ import ProfileStep2 from "./ProfileStep2";
 import ProfileStep3 from "./ProfileStep3";
 import ProfileStep4 from "./ProfileStep4";
 import ProfileStep5 from "./ProfileStep5";
+import SendingConfirmationDialog from "./SendingConfirmationDialog";
 
 export default {
   name: "AttestableView",
@@ -66,11 +71,13 @@ export default {
     ProfileStep2,
     ProfileStep3,
     ProfileStep4,
-    ProfileStep5
+    ProfileStep5,
+    SendingConfirmationDialog
   },
   data() {
     return {
-      stepperStatus: 1
+      stepperStatus: 1,
+      confirmationDialog: false
     };
   }
 };

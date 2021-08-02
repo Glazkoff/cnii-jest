@@ -9,6 +9,7 @@ export const SET_FIRST_PROFILE_PART = gql`
     $birthday: Date
     $sex: String
     $patricity: String
+    $photo: Upload
   ) {
     setFirstProfilePart(
       userId: $userId
@@ -17,6 +18,7 @@ export const SET_FIRST_PROFILE_PART = gql`
       birthday: $birthday
       sex: $sex
       patricity: $patricity
+      photo: $photo
     ) {
       user {
         id
@@ -25,6 +27,7 @@ export const SET_FIRST_PROFILE_PART = gql`
         patricity
         sex
         birthday
+        photo
       }
     }
   }
@@ -104,10 +107,41 @@ export const SET_FOURTH_PROFILE_PART = gql`
       workPhone: $workPhone
     ) {
       user {
+        id
         homeAddress
         personalPhone
         homePhone
         workPhone
+      }
+    }
+  }
+`;
+
+// Мутация для отправки данных четвёртого шага
+export const SET_FIFTH_PROFILE_PART = gql`
+  mutation (
+    $userId: ID!
+    $workExperienceFullYears: Int
+    $workExperienceCurrentJob: Int
+    $awards: String
+    $training: String
+    $organizationMembership: String
+  ) {
+    setFifthProfilePart(
+      userId: $userId
+      workExperienceFullYears: $workExperienceFullYears
+      workExperienceCurrentJob: $workExperienceCurrentJob
+      awards: $awards
+      training: $training
+      organizationMembership: $organizationMembership
+    ) {
+      user {
+        id
+        workExperienceFullYears
+        workExperienceCurrentJob
+        awards
+        training
+        organizationMembership
       }
     }
   }

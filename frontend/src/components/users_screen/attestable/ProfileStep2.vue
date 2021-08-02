@@ -286,7 +286,7 @@ export default {
               data.user.citizenship = setSecondProfilePart.user.citizenship;
               data.user.martialStatus = setSecondProfilePart.user.martialStatus;
               data.user.organization = setSecondProfilePart.user.organization;
-              data.user.job_position = setSecondProfilePart.user.job_position;
+              data.user.jobPosition = setSecondProfilePart.user.jobPosition;
               data.user.education = setSecondProfilePart.user.education;
 
               cache.writeQuery({
