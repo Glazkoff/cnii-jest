@@ -17,6 +17,7 @@ graphene-django
 graphene-file-upload
 transliterate
 django-cleanup
+graphene-django-optimizer
 # django-appypod
 # django-webodt
 # django-template-engines

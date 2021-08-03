@@ -3,21 +3,22 @@ from django.contrib.auth.models import User
 from .models import CustomUser, Request
 from .types import CustomUserType, RequestType
 from .mutations import SetFirstProfilePartMutation, SetSecondProfilePartMutation, SetThirdProfilePartMutation, SetFourthProfilePartMutation, SetFifthProfilePartMutation
+import graphene_django_optimizer as gql_optimizer
 
 
 class Query(graphene.ObjectType):
     users = graphene.List(CustomUserType)
     user = graphene.Field(CustomUserType, user_id=graphene.ID())
     request = graphene.Field(RequestType, request_id=graphene.ID())
-    # user_requests = graphene.List(Request, user_id=graphene.ID())
+    user_requests = graphene.List(RequestType, user_id=graphene.ID())
 
     def resolve_users(self, info, **kwargs):
-        return CustomUser.objects.all()
+        return gql_optimizer.query(CustomUser.objects.all(), info)
 
     def resolve_user(self, info, user_id):
         try:
             return CustomUser.objects.get(pk=user_id)
-        except:
+        except (CustomUser.DoesNotExist,):
             return None
 
     def resolve_request(self, info, request_id):
@@ -26,12 +27,12 @@ class Query(graphene.ObjectType):
         except:
             return None
 
-    # def resolve_user_requests(self, info, user_id):
-    #     try:
-    #         user = User.objects.get(pk=user_id)
-    #         return Request.objects.filter(user=user)
-    #     except:
-    #         return None
+    def resolve_user_requests(self, info, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+            return gql_optimizer.query(Request.objects.filter(user=user), info)
+        except:
+            return None
 
 
 class Mutation(graphene.ObjectType):
