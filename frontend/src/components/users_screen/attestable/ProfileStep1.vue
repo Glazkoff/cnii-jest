@@ -1,11 +1,8 @@
 <template>
   <div>
-    <v-progress-circular
-      indeterminate
-      color="primary"
-      v-if="this.$apollo.queries.user.loading"
-    >
-    </v-progress-circular>
+    <div v-if="this.$apollo.queries.user.loading || circleLoading">
+      <v-progress-circular indeterminate color="primary"> </v-progress-circular>
+    </div>
     <v-form ref="form" lazy-validation v-else>
       <v-text-field
         label="Фамилия"
@@ -107,7 +104,7 @@
       color="primary"
       :disabled="$v.form.$anyError"
       @click="goToNextStep"
-      v-if="!this.$apollo.queries.user.loading"
+      v-if="!this.$apollo.queries.user.loading && !circleLoading"
     >
       Далее
     </v-btn>
@@ -128,6 +125,7 @@ export default {
   data() {
     return {
       formLoading: false,
+      circleLoading: false,
       form: {
         surname: null,
         name: null,
@@ -166,6 +164,7 @@ export default {
           this.$v.form.$model.birthday = val.birthday;
         }
         if (val.photo) {
+          this.circleLoading = true;
           this.$http({
             url: "/media/" + val.photo,
             method: "GET",
@@ -175,6 +174,8 @@ export default {
               [response.data],
               val.photo.split("/")[val.photo.split("/").length - 1]
             );
+            this.circleLoading = false;
+            this.$v.form.photo.$touch();
           });
         }
       }

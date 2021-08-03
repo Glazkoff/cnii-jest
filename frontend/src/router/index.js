@@ -8,6 +8,7 @@ import LogIn from "@/components/auth/LogIn.vue";
 import SignUp from "@/components/auth/SignUp.vue";
 import UserStatusScreen from "@/components/users_screen/UserStatusScreen.vue";
 import AttestableView from "@/components/users_screen/attestable/AttestableView.vue";
+import AttestableList from "@/components/users_screen/attestable/AttestableList.vue";
 
 Vue.use(VueRouter);
 
@@ -59,9 +60,14 @@ const routes = [
         component: UserStatusScreen,
         children: [
           {
-            path: "/",
+            path: "/request/:id",
             component: AttestableView,
             name: "AttestableView"
+          },
+          {
+            path: "/",
+            component: AttestableList,
+            name: "AttestableList"
           }
         ]
       }

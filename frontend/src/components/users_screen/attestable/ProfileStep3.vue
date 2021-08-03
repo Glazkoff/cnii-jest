@@ -1,11 +1,12 @@
 <template>
   <div>
-    <v-progress-circular
-      indeterminate
-      color="primary"
-      v-if="this.$apollo.queries.user.loading"
+    <div
+      v-if="
+        this.$apollo.queries.user.loading || circleLoading1 || circleLoading2
+      "
     >
-    </v-progress-circular>
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
     <v-form ref="form" lazy-validation v-else>
       <v-text-field
         label="Данные паспорта"
@@ -50,7 +51,9 @@
       color="primary"
       :disabled="$v.form.$anyError"
       @click="goToNextStep"
-      v-if="!this.$apollo.queries.user.loading"
+      v-if="
+        !this.$apollo.queries.user.loading && !circleLoading1 && !circleLoading2
+      "
     >
       Далее
     </v-btn>
@@ -59,7 +62,9 @@
       class="mt-2"
       :disabled="$v.form.$anyError"
       @click="goToPrevStep"
-      v-if="!this.$apollo.queries.user.loading"
+      v-if="
+        !this.$apollo.queries.user.loading && !circleLoading1 && !circleLoading2
+      "
     >
       Назад
     </v-btn>
@@ -81,6 +86,8 @@ export default {
   data() {
     return {
       formLoading: false,
+      circleLoading1: false,
+      circleLoading2: false,
       form: {
         passport: null,
         passport_part1_scan: null,
@@ -105,6 +112,7 @@ export default {
           this.$v.form.$model.passport = val.passport;
         }
         if (val.passportPart1Scan) {
+          this.circleLoading1 = true;
           this.$http({
             url: "/media/" + val.passportPart1Scan,
             method: "GET",
@@ -116,9 +124,12 @@ export default {
                 val.passportPart1Scan.split("/").length - 1
               ]
             );
+            this.circleLoading1 = false;
+            this.$v.form.passport_part1_scan.$touch();
           });
         }
         if (val.passportPart2Scan) {
+          this.circleLoading2 = true;
           this.$http({
             url: "/media/" + val.passportPart1Scan,
             method: "GET",
@@ -130,6 +141,8 @@ export default {
                 val.passportPart2Scan.split("/").length - 1
               ]
             );
+            this.circleLoading2 = false;
+            this.$v.form.passport_part2_scan.$touch();
           });
         }
       }

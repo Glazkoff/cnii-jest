@@ -68,3 +68,17 @@ export const GET_FIFTH_PROFILE_PART = gql`
     }
   }
 `;
+
+// Запрос списка заявок одного пользователя
+export const USER_REQUESTS = gql`
+  query ($userId: ID!) {
+    userRequests(userId: $userId) {
+      id
+      requestNumber
+      status
+    }
+  }
+`;
+
+// Запрос данных о текущем статусе заявки
+// export const

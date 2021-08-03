@@ -7,7 +7,7 @@
       ></v-app-bar-nav-icon>
       <v-toolbar-title>ЦНИИ Русского жестового языка </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn text> Подать заявку </v-btn>
+      <v-btn text to="/" v-if="isAuthenticated"> Список заявок </v-btn>
       <v-btn to="/login" v-if="!isAuthenticated">Войти</v-btn>
       <v-btn text v-if="isAuthenticated" @click="logOut">Выйти</v-btn>
     </v-container>

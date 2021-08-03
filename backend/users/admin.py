@@ -50,6 +50,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 class RequestsAdmin(admin.ModelAdmin):
     list_display = ("request_number", "user", "status",
                     "created_at", "updated_at")
+    list_filter = ('status',)
 
     class Meta:
         model = Request

@@ -1,11 +1,8 @@
 <template>
   <div>
-    <v-progress-circular
-      indeterminate
-      color="primary"
-      v-if="this.$apollo.queries.user.loading"
-    >
-    </v-progress-circular>
+    <div v-if="this.$apollo.queries.user.loading">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
     <v-form ref="form" lazy-validation v-else>
       <v-text-field
         label="Стаж полных лет"
