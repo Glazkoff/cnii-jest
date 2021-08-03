@@ -1,7 +1,18 @@
 <template>
   <div>
     <h1 class="mb-2">Данные для аттестации</h1>
-    <v-stepper v-model="stepperStatus" vertical>
+    <v-layout
+      v-if="this.$apollo.queries.request.loading || stepperLoading"
+      fill-height
+    >
+      <v-layout align-center d-flex fill-height justify-center wrap>
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </v-layout>
+    </v-layout>
+    <v-stepper v-model="stepperStatus" vertical v-else>
       <v-stepper-step step="1" :complete="stepperStatus >= 1">
         Шаг 1. Личные данные
       </v-stepper-step>
@@ -45,7 +56,7 @@
       <v-stepper-content step="5">
         <ProfileStep5
           @goToPrevStep="stepperStatus = 4"
-          @goToNextStep="confirmationDialog = true"
+          @goToNextStep="finishEditing()"
         ></ProfileStep5>
       </v-stepper-content>
     </v-stepper>
@@ -63,6 +74,7 @@ import ProfileStep3 from "./ProfileStep3";
 import ProfileStep4 from "./ProfileStep4";
 import ProfileStep5 from "./ProfileStep5";
 import SendingConfirmationDialog from "./SendingConfirmationDialog";
+import { REQUEST_STATUS } from "@/graphql/user_request_queries.js";
 
 export default {
   name: "AttestableView",
@@ -77,8 +89,49 @@ export default {
   data() {
     return {
       stepperStatus: 1,
-      confirmationDialog: false
+      confirmationDialog: false,
+      stepperLoading: false
     };
+  },
+  apollo: {
+    request: {
+      query: REQUEST_STATUS,
+      variables() {
+        return {
+          requestId: this.$route.params.id
+        };
+      }
+    }
+  },
+  watch: {
+    request(val) {
+      if (val.status) {
+        switch (val.status.toUpperCase()) {
+          case "STEP_1":
+            this.stepperStatus = 1;
+            break;
+          case "STEP_2":
+            this.stepperStatus = 2;
+            break;
+          case "STEP_3":
+            this.stepperStatus = 3;
+            break;
+          case "STEP_4":
+            this.stepperStatus = 4;
+            break;
+          case "STEP_5":
+            this.stepperStatus = 5;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  },
+  methods: {
+    finishEditing() {
+      this.stepperLoading = true;
+    }
   }
 };
 </script>

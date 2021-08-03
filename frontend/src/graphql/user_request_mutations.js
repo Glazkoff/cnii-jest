@@ -117,7 +117,7 @@ export const SET_FOURTH_PROFILE_PART = gql`
   }
 `;
 
-// Мутация для отправки данных четвёртого шага
+// Мутация для отправки данных пятого шага
 export const SET_FIFTH_PROFILE_PART = gql`
   mutation (
     $userId: ID!
@@ -142,6 +142,18 @@ export const SET_FIFTH_PROFILE_PART = gql`
         awards
         training
         organizationMembership
+      }
+    }
+  }
+`;
+
+// Мутация для обновления данных шага
+export const UPDATE_REQUEST_STATUS = gql`
+  mutation ($requestId: ID!, $statusNumber: Int!) {
+    updateRequestStatus(requestId: $requestId, statusNumber: $statusNumber) {
+      request {
+        id
+        status
       }
     }
   }

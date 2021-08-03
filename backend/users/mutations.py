@@ -204,17 +204,25 @@ class SetFifthProfilePartMutation(graphene.Mutation):
 
 class UpdateRequestStatusMutation(graphene.Mutation):
     class Arguments:
-        user_id = graphene.ID(required=True)
         request_id = graphene.ID()
-        status = graphene.String()
+        status_number = graphene.Int()
 
     request = graphene.Field(RequestType)
 
     @classmethod
-    def mutate(cls, root, info, request_id, status):
+    def mutate(cls, root, info, request_id, status_number):
         try:
             request = Request.objects.get(pk=request_id)
-            request.status = status
+            if status_number == 1:
+                request.status = "step_1"
+            if status_number == 2:
+                request.status = "step_2"
+            if status_number == 3:
+                request.status = "step_3"
+            if status_number == 4:
+                request.status = "step_4"
+            if status_number == 5:
+                request.status = "step_5"
             request.save()
             return UpdateRequestStatusMutation(request=request)
         except:

@@ -81,4 +81,11 @@ export const USER_REQUESTS = gql`
 `;
 
 // Запрос данных о текущем статусе заявки
-// export const
+export const REQUEST_STATUS = gql`
+  query ($requestId: ID!) {
+    request(requestId: $requestId) {
+      id
+      status
+    }
+  }
+`;

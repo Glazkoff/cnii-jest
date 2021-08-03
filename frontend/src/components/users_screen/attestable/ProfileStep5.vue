@@ -119,7 +119,10 @@
 // - organization_membership Членство в организациях
 
 import { required } from "vuelidate/lib/validators";
-import { SET_FIFTH_PROFILE_PART } from "@/graphql/user_request_mutations.js";
+import {
+  SET_FIFTH_PROFILE_PART,
+  UPDATE_REQUEST_STATUS
+} from "@/graphql/user_request_mutations.js";
 import { GET_FIFTH_PROFILE_PART } from "@/graphql/user_request_queries.js";
 
 export default {
@@ -217,6 +220,24 @@ export default {
     }
   },
   methods: {
+    sendCurrentStep(stepNumber) {
+      return new Promise((resolve, reject) => {
+        this.$apollo
+          .mutate({
+            mutation: UPDATE_REQUEST_STATUS,
+            variables: {
+              requestId: this.$route.params.id,
+              statusNumber: stepNumber
+            }
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch(() => {
+            reject();
+          });
+      });
+    },
     goToNextStep() {
       this.$v.form.$touch();
       if (!this.$v.form.$anyError) {
@@ -224,8 +245,9 @@ export default {
         this.sendForm()
           .then(() => {
             this.$emit("goToNextStep");
+            this.formLoading = false;
           })
-          .finally(() => {
+          .catch(() => {
             this.formLoading = false;
           });
       }
@@ -234,9 +256,12 @@ export default {
       this.formLoading = true;
       this.sendForm()
         .then(() => {
-          this.$emit("goToPrevStep");
+          this.sendCurrentStep(4).finally(() => {
+            this.$emit("goToPrevStep");
+            this.formLoading = false;
+          });
         })
-        .finally(() => {
+        .catch(() => {
           this.formLoading = false;
         });
     },
