@@ -75,7 +75,7 @@ import ProfileStep4 from "./ProfileStep4";
 import ProfileStep5 from "./ProfileStep5";
 import SendingConfirmationDialog from "./SendingConfirmationDialog";
 import { REQUEST_STATUS } from "@/graphql/user_request_queries.js";
-
+import { FINISH_REQUEST } from "@/graphql/user_request_mutations.js";
 export default {
   name: "AttestableView",
   components: {
@@ -131,6 +131,15 @@ export default {
   methods: {
     finishEditing() {
       this.stepperLoading = true;
+      this.$apollo
+        .mutate({
+          mutation: FINISH_REQUEST,
+          variables: { requestId: this.$route.params.id }
+        })
+        .then(() => {
+          this.stepperLoading = false;
+          this.confirmationDialog = true;
+        });
     }
   }
 };

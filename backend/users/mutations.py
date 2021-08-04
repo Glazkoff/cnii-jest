@@ -227,3 +227,21 @@ class UpdateRequestStatusMutation(graphene.Mutation):
             return UpdateRequestStatusMutation(request=request)
         except:
             return UpdateRequestStatusMutation(request=None)
+
+
+class FinishRequestMutation(graphene.Mutation):
+    class Arguments:
+        request_id = graphene.ID()
+
+    request = graphene.Field(RequestType)
+
+    @classmethod
+    def mutate(cls, root, info, request_id):
+        try:
+            request = Request.objects.get(pk=request_id)
+            # TODO: add creating of table with codes
+            request.status = "on_check"
+            request.save()
+            return UpdateRequestStatusMutation(request=request)
+        except:
+            return UpdateRequestStatusMutation(request=None)

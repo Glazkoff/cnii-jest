@@ -158,3 +158,15 @@ export const UPDATE_REQUEST_STATUS = gql`
     }
   }
 `;
+
+// Мутация для завершения работы с заявкой для пользователя
+export const FINISH_REQUEST = gql`
+  mutation ($requestId: ID!) {
+    finishRequest(requestId: $requestId) {
+      request {
+        id
+        status
+      }
+    }
+  }
+`;

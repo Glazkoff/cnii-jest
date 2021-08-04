@@ -3,10 +3,10 @@
     <v-dialog v-model="innerDialog" width="500">
       <v-card>
         <v-card-text>
-          <div>
-            <v-icon large color="primary"> mdi-email-send </v-icon>
+          <div class="text-center">
+            <v-icon large color="primary"> mdi-check-circle-outline </v-icon>
           </div>
-          <div>Вы уверены, что хотите отправить заявку?</div>
+          <div class="text-center">Вы успешно отправили заявку!</div>
         </v-card-text>
 
         <v-divider></v-divider>
