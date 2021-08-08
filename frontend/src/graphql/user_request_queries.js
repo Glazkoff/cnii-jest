@@ -65,6 +65,7 @@ export const GET_FIFTH_PROFILE_PART = gql`
       awards
       training
       organizationMembership
+      characteristic
     }
   }
 `;

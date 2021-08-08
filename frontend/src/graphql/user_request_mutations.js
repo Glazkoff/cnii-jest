@@ -126,6 +126,7 @@ export const SET_FIFTH_PROFILE_PART = gql`
     $awards: String
     $training: String
     $organizationMembership: String
+    $characteristic: Upload
   ) {
     setFifthProfilePart(
       userId: $userId
@@ -134,6 +135,7 @@ export const SET_FIFTH_PROFILE_PART = gql`
       awards: $awards
       training: $training
       organizationMembership: $organizationMembership
+      characteristic: $characteristic
     ) {
       user {
         id
@@ -142,6 +144,7 @@ export const SET_FIFTH_PROFILE_PART = gql`
         awards
         training
         organizationMembership
+        characteristic
       }
     }
   }

@@ -49,6 +49,8 @@ class CustomUser(models.Model):
     training = models.TextField("Повышение квалификации", blank=True)
     organization_membership = models.TextField(
         "Членство в организациях", blank=True)
+    characteristic = models.ImageField(verbose_name="Характеристика",
+                                       upload_to='characteristic', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

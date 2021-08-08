@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="this.$apollo.queries.user.loading">
+    <div v-if="this.$apollo.queries.user.loading || circleLoading">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-form ref="form" lazy-validation v-else>
@@ -88,6 +88,17 @@
         class="mb-2"
         required
       ></v-textarea>
+      <v-file-input
+        chips
+        accept="image/png, image/jpeg, image/bmp"
+        placeholder="Прикрепите скан"
+        label="Характеристика"
+        prepend-icon="mdi-camera"
+        :error-messages="characteristicErrors"
+        v-model="$v.form.characteristic.$model"
+        @input="sendForm()"
+        @blur="sendForm()"
+      ></v-file-input>
     </v-form>
     <v-btn
       class="mt-2"
@@ -130,6 +141,7 @@ export default {
   data() {
     return {
       formLoading: false,
+      circleLoading: false,
       form: {
         work_experience_full_years: null,
         work_experience_current_job: null,
@@ -170,6 +182,23 @@ export default {
           this.$v.form.$model.organization_membership =
             val.organizationMembership;
         }
+        if (val.characteristic) {
+          this.circleLoading = true;
+          this.$http({
+            url: "/media/" + val.characteristic,
+            method: "GET",
+            responseType: "blob"
+          }).then(response => {
+            this.$v.form.$model.characteristic = new File(
+              [response.data],
+              val.characteristic.split("/")[
+                val.characteristic.split("/").length - 1
+              ]
+            );
+            this.circleLoading = false;
+            this.$v.form.characteristic.$touch();
+          });
+        }
       }
     }
   },
@@ -179,7 +208,8 @@ export default {
       work_experience_current_job: { required },
       awards: { required },
       training: { required },
-      organization_membership: { required }
+      organization_membership: { required },
+      characteristic: { required }
     }
   },
   computed: {
@@ -216,6 +246,13 @@ export default {
       if (!this.$v.form.organization_membership.$dirty) return errors;
       !this.$v.form.organization_membership.required &&
         errors.push("Поле 'Членство в организациях' обязательно!");
+      return errors;
+    },
+    characteristicErrors() {
+      const errors = [];
+      if (!this.$v.form.characteristic.$dirty) return errors;
+      !this.$v.form.characteristic.required &&
+        errors.push("Поле 'Характеристика' обязательно!");
       return errors;
     }
   },
@@ -279,7 +316,8 @@ export default {
               awards: this.$v.form.$model.awards,
               training: this.$v.form.$model.training,
               organizationMembership:
-                this.$v.form.$model.organization_membership
+                this.$v.form.$model.organization_membership,
+              characteristic: this.$v.form.$model.characteristic
             },
             update: (cache, { data: { setFifthProfilePart } }) => {
               const data = cache.readQuery({

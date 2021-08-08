@@ -22,6 +22,8 @@
       <v-text-field
         label="Мобильный телефон"
         autocomplete="phone"
+        v-mask="'+7 (###) ###-##-##'"
+        placeholder="+7 (###) ###-##-##"
         v-model="$v.form.personal_phone.$model"
         :error-messages="personalPhoneErrors"
         @input="
@@ -37,6 +39,8 @@
       <v-text-field
         label="Домашний телефон"
         autocomplete="home_phone"
+        v-mask="'+7 (###) ###-##-##'"
+        placeholder="+7 (###) ###-##-##"
         v-model="$v.form.home_phone.$model"
         :error-messages="homePhoneErrors"
         @input="
@@ -47,11 +51,12 @@
           $v.form.home_phone.$touch();
           sendForm();
         "
-        required
       ></v-text-field>
       <v-text-field
         label="Рабочий телефон"
         autocomplete="work_phone"
+        v-mask="'+7 (###) ###-##-##'"
+        placeholder="+7 (###) ###-##-##"
         v-model="$v.form.work_phone.$model"
         :error-messages="workPhoneErrors"
         @input="
@@ -62,7 +67,6 @@
           $v.form.work_phone.$touch();
           sendForm();
         "
-        required
       ></v-text-field>
     </v-form>
     <v-btn
@@ -146,8 +150,8 @@ export default {
     form: {
       home_address: { required },
       personal_phone: { required },
-      home_phone: { required },
-      work_phone: { required }
+      home_phone: {},
+      work_phone: {}
     }
   },
   computed: {
@@ -168,15 +172,15 @@ export default {
     homePhoneErrors() {
       const errors = [];
       if (!this.$v.form.home_phone.$dirty) return errors;
-      !this.$v.form.home_phone.required &&
-        errors.push("Поле 'Домашний телефон' обязательно!");
+      // !this.$v.form.home_phone.required &&
+      //   errors.push("Поле 'Домашний телефон' обязательно!");
       return errors;
     },
     workPhoneErrors() {
       const errors = [];
       if (!this.$v.form.work_phone.$dirty) return errors;
-      !this.$v.form.work_phone.required &&
-        errors.push("Поле 'Рабочий телефон' обязательно!");
+      // !this.$v.form.work_phone.required &&
+      //   errors.push("Поле 'Рабочий телефон' обязательно!");
       return errors;
     }
   },

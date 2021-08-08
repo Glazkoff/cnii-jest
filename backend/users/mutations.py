@@ -177,12 +177,14 @@ class SetFifthProfilePartMutation(graphene.Mutation):
         awards = graphene.String()
         training = graphene.String()
         organization_membership = graphene.String()
+        characteristic = Upload()
 
     user = graphene.Field(CustomUserType)
 
     @classmethod
-    def mutate(cls, root, info, user_id, work_experience_full_years=None, work_experience_current_job=None, awards=None, training=None, organization_membership=None):
+    def mutate(cls, root, info, user_id, work_experience_full_years=None, work_experience_current_job=None, awards=None, training=None, organization_membership=None, characteristic=None):
         try:
+            now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
             user = User.objects.get(pk=user_id)
             custom_user = CustomUser.objects.get_or_create(user=user)
             if work_experience_full_years is not None:
@@ -196,6 +198,18 @@ class SetFifthProfilePartMutation(graphene.Mutation):
             if organization_membership is not None:
                 custom_user[0].organization_membership = organization_membership
             custom_user[0].save()
+            if characteristic is not None:
+                filename, extension = os.path.splitext(
+                    characteristic.name)
+                surname = translit(
+                    custom_user[0].surname, language_code='ru', reversed=True)
+                name = translit(
+                    custom_user[0].name, language_code='ru', reversed=True)
+                patricity = translit(
+                    custom_user[0].patricity, language_code='ru', reversed=True)
+                new_filename = f"{surname}_{name}_{patricity}_characteristic_{now}{extension}"
+                custom_user[0].characteristic.save(
+                    new_filename, File(characteristic))
 
             return SetFifthProfilePartMutation(user=custom_user[0])
         except (User.DoesNotExist,):
