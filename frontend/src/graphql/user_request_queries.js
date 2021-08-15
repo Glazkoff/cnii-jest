@@ -68,6 +68,7 @@ export const GET_FIFTH_PROFILE_PART = gql`
       training
       organizationMembership
       characteristic
+      employmentHistory
     }
   }
 `;

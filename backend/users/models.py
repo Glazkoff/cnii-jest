@@ -49,6 +49,8 @@ class CustomUser(models.Model):
         "Стаж полных лет", blank=True, null=True)
     work_experience_current_job = models.IntegerField(
         "Стаж настоящей должности", blank=True, null=True)
+    employment_history = models.FileField(
+        verbose_name="Заверенная копия трудовой книжки (все страницы)", upload_to='employment_history', blank=True)
     awards = models.TextField("Наличие наград", blank=True)
     training = models.TextField("Повышение квалификации", blank=True)
     organization_membership = models.TextField(

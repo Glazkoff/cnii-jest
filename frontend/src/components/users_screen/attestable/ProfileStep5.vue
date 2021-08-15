@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-if="this.$apollo.queries.user.loading || circleLoading">
+    <div
+      v-if="
+        this.$apollo.queries.user.loading || circleLoading || circleLoading2
+      "
+    >
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-form ref="form" lazy-validation v-else>
@@ -99,6 +103,15 @@
         @input="sendForm()"
         @blur="sendForm()"
       ></v-file-input>
+      <v-file-input
+        chips
+        accept="application/pdf"
+        placeholder="Прикрепите скан"
+        label="Заверенная копия трудовой книжки (все страницы)"
+        prepend-icon="mdi-file-document-outline"
+        :error-messages="employmentHistoryErrors"
+        v-model="$v.form.employment_history.$model"
+      ></v-file-input>
     </v-form>
     <v-btn
       class="mt-2"
@@ -142,6 +155,7 @@ export default {
     return {
       formLoading: false,
       circleLoading: false,
+      circleLoading2: false,
       form: {
         work_experience_full_years: null,
         work_experience_current_job: null,
@@ -199,6 +213,23 @@ export default {
             this.$v.form.characteristic.$touch();
           });
         }
+        if (val.employmentHistory) {
+          this.circleLoading2 = true;
+          this.$http({
+            url: "/media/" + val.employmentHistory,
+            method: "GET",
+            responseType: "blob"
+          }).then(response => {
+            this.$v.form.$model.employment_history = new File(
+              [response.data],
+              val.employmentHistory.split("/")[
+                val.employmentHistory.split("/").length - 1
+              ]
+            );
+            this.circleLoading2 = false;
+            this.$v.form.employment_history.$touch();
+          });
+        }
       }
     }
   },
@@ -209,7 +240,8 @@ export default {
       awards: { required },
       training: { required },
       organization_membership: { required },
-      characteristic: { required }
+      characteristic: { required },
+      employment_history: { required }
     }
   },
   computed: {
@@ -253,6 +285,13 @@ export default {
       if (!this.$v.form.characteristic.$dirty) return errors;
       !this.$v.form.characteristic.required &&
         errors.push("Поле 'Характеристика' обязательно!");
+      return errors;
+    },
+    employmentHistoryErrors() {
+      const errors = [];
+      if (!this.$v.form.employment_history.$dirty) return errors;
+      !this.$v.form.employment_history.required &&
+        errors.push("Поле 'Копия трудовой книжки' обязательно!");
       return errors;
     }
   },
@@ -318,7 +357,8 @@ export default {
               training: this.$v.form.$model.training,
               organizationMembership:
                 this.$v.form.$model.organization_membership,
-              characteristic: this.$v.form.$model.characteristic
+              characteristic: this.$v.form.$model.characteristic,
+              employmentHistory: this.$v.form.$model.employment_history
             },
             update: (cache, { data: { setFifthProfilePart } }) => {
               const data = cache.readQuery({
