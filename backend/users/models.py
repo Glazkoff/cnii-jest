@@ -14,7 +14,7 @@ class CustomUser(models.Model):
     birthday = models.DateField("Дата рождения", blank=True, null=True)
     sex = models.CharField(verbose_name="Пол", max_length=1,
                            choices=SEX_CHOICES, blank=True)
-    photo = models.ImageField(verbose_name="Фото",
+    photo = models.ImageField(verbose_name="Загрузка фото",
                               upload_to='photo', blank=True)
     native_language = models.CharField(
         "Родной язык", max_length=150, blank=True)
@@ -27,6 +27,10 @@ class CustomUser(models.Model):
     # TODO: запрашиваемая категория аттестации
     # TODO: Заявленная сфера деятельности FK
     education = models.CharField("Образование", max_length=150, blank=True)
+    main_diploma_scan = models.ImageField(verbose_name="Скан диплома об образовании",
+                                          upload_to='main_diploma', blank=True)
+    gesture_diploma_scan = models.ImageField(verbose_name="Скан диплома о подготовке по жестовому языку",
+                                             upload_to='gesture_diploma', blank=True)
     home_address = models.CharField(
         "Домашний адрес", max_length=150, blank=True)
     passport = models.CharField("Данные паспорта", max_length=150, blank=True)

@@ -65,11 +65,13 @@ class SetSecondProfilePartMutation(graphene.Mutation):
         organization = graphene.String()
         job_position = graphene.String()
         education = graphene.String()
+        main_diploma_scan = Upload()
+        gesture_diploma_scan = Upload()
 
     user = graphene.Field(CustomUserType)
 
     @classmethod
-    def mutate(cls, root, info, user_id, native_language=None, citizenship=None, martial_status=None, organization=None, job_position=None, education=None):
+    def mutate(cls, root, info, user_id, native_language=None, citizenship=None, martial_status=None, organization=None, job_position=None, education=None, main_diploma_scan=None, gesture_diploma_scan=None):
         try:
             user = User.objects.get(pk=user_id)
             custom_user = CustomUser.objects.get_or_create(user=user)
@@ -85,6 +87,31 @@ class SetSecondProfilePartMutation(graphene.Mutation):
                 custom_user[0].job_position = job_position
             if education is not None:
                 custom_user[0].education = education
+            now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+            if main_diploma_scan is not None:
+                filename, extension = os.path.splitext(
+                    main_diploma_scan.name)
+                surname = translit(
+                    custom_user[0].surname, language_code='ru', reversed=True)
+                name = translit(
+                    custom_user[0].name, language_code='ru', reversed=True)
+                patricity = translit(
+                    custom_user[0].patricity, language_code='ru', reversed=True)
+                new_filename = f"{surname}_{name}_{patricity}_main_diploma_{now}{extension}"
+                custom_user[0].main_diploma_scan.save(
+                    new_filename, File(main_diploma_scan))
+            if gesture_diploma_scan is not None:
+                filename, extension = os.path.splitext(
+                    gesture_diploma_scan.name)
+                surname = translit(
+                    custom_user[0].surname, language_code='ru', reversed=True)
+                name = translit(
+                    custom_user[0].name, language_code='ru', reversed=True)
+                patricity = translit(
+                    custom_user[0].patricity, language_code='ru', reversed=True)
+                new_filename = f"{surname}_{name}_{patricity}_gesture_diploma_{now}{extension}"
+                custom_user[0].gesture_diploma_scan.save(
+                    new_filename, File(gesture_diploma_scan))
             custom_user[0].save()
 
             return SetSecondProfilePartMutation(user=custom_user[0])
@@ -199,6 +226,8 @@ class SetFifthProfilePartMutation(graphene.Mutation):
                 custom_user[0].organization_membership = organization_membership
             custom_user[0].save()
             if characteristic is not None:
+                print("characteristic")
+                print(characteristic)
                 filename, extension = os.path.splitext(
                     characteristic.name)
                 surname = translit(

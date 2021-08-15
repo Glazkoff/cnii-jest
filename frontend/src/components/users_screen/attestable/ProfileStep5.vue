@@ -303,6 +303,7 @@ export default {
         });
     },
     sendForm() {
+      console.log(this.$v.form.$model.characteristic);
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({

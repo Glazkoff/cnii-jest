@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-if="this.$apollo.queries.user.loading">
+    <div
+      v-if="
+        this.$apollo.queries.user.loading || circleLoading1 || circleLoading2
+      "
+    >
       <v-progress-circular indeterminate color="primary"> </v-progress-circular>
     </div>
     <v-form ref="form" lazy-validation v-else>
@@ -94,6 +98,28 @@
         "
         required
       ></v-text-field>
+      <v-file-input
+        chips
+        accept="image/png, image/jpeg, image/bmp"
+        placeholder="Прикрепите скан"
+        label="Скан диплома об образовании"
+        prepend-icon="mdi-camera"
+        :error-messages="mainDiplomaErrors"
+        v-model="$v.form.main_diploma_scan.$model"
+        @input="sendForm()"
+        @blur="sendForm()"
+      ></v-file-input>
+      <v-file-input
+        chips
+        accept="image/png, image/jpeg, image/bmp"
+        placeholder="Прикрепите скан"
+        label="Скан диплома о подготовке по жестовому языку"
+        prepend-icon="mdi-camera"
+        :error-messages="gestureDiplomaErrors"
+        v-model="$v.form.gesture_diploma_scan.$model"
+        @input="sendForm()"
+        @blur="sendForm()"
+      ></v-file-input>
     </v-form>
     <v-btn
       class="mt-2"
@@ -136,13 +162,17 @@ export default {
   data() {
     return {
       formLoading: false,
+      circleLoading1: false,
+      circleLoading2: false,
       form: {
         native_language: null,
         citizenship: null,
         martial_status: null,
         organization: null,
         job_position: null,
-        education: null
+        education: null,
+        main_diploma_scan: null,
+        gesture_diploma_scan: null
       }
     };
   },
@@ -177,6 +207,40 @@ export default {
         if (val.education) {
           this.$v.form.$model.education = val.education;
         }
+        if (val.mainDiplomaScan) {
+          this.circleLoading1 = true;
+          this.$http({
+            url: "/media/" + val.mainDiplomaScan,
+            method: "GET",
+            responseType: "blob"
+          }).then(response => {
+            this.$v.form.$model.main_diploma_scan = new File(
+              [response.data],
+              val.mainDiplomaScan.split("/")[
+                val.mainDiplomaScan.split("/").length - 1
+              ]
+            );
+            this.circleLoading1 = false;
+            this.$v.form.main_diploma_scan.$touch();
+          });
+        }
+        if (val.gestureDiplomaScan) {
+          this.circleLoading2 = true;
+          this.$http({
+            url: "/media/" + val.gestureDiplomaScan,
+            method: "GET",
+            responseType: "blob"
+          }).then(response => {
+            this.$v.form.$model.gesture_diploma_scan = new File(
+              [response.data],
+              val.gestureDiplomaScan.split("/")[
+                val.gestureDiplomaScan.split("/").length - 1
+              ]
+            );
+            this.circleLoading2 = false;
+            this.$v.form.gesture_diploma_scan.$touch();
+          });
+        }
       }
     }
   },
@@ -187,7 +251,9 @@ export default {
       martial_status: { required },
       organization: { required },
       job_position: { required },
-      education: { required }
+      education: { required },
+      main_diploma_scan: { required },
+      gesture_diploma_scan: { required }
     }
   },
   computed: {
@@ -232,6 +298,20 @@ export default {
       if (!this.$v.form.education.$dirty) return errors;
       !this.$v.form.education.required &&
         errors.push("Поле 'Образование' обязательно!");
+      return errors;
+    },
+    mainDiplomaErrors() {
+      const errors = [];
+      if (!this.$v.form.main_diploma_scan.$dirty) return errors;
+      !this.$v.form.main_diploma_scan.required &&
+        errors.push("Поле 'Диплом об образовании' обязательно!");
+      return errors;
+    },
+    gestureDiplomaErrors() {
+      const errors = [];
+      if (!this.$v.form.gesture_diploma_scan.$dirty) return errors;
+      !this.$v.form.gesture_diploma_scan.required &&
+        errors.push("Поле 'Диплом об подготовке' обязательно!");
       return errors;
     }
   },
@@ -295,7 +375,9 @@ export default {
               martialStatus: this.$v.form.$model.martial_status,
               organization: this.$v.form.$model.organization,
               jobPosition: this.$v.form.$model.job_position,
-              education: this.$v.form.$model.education
+              education: this.$v.form.$model.education,
+              mainDiplomaScan: this.$v.form.$model.main_diploma_scan,
+              gestureDiplomaScan: this.$v.form.$model.gesture_diploma_scan
             },
             update: (cache, { data: { setSecondProfilePart } }) => {
               const data = cache.readQuery({

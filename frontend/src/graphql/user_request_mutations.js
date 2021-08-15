@@ -43,6 +43,8 @@ export const SET_SECOND_PROFILE_PART = gql`
     $organization: String
     $jobPosition: String
     $education: String
+    $mainDiplomaScan: Upload
+    $gestureDiplomaScan: Upload
   ) {
     setSecondProfilePart(
       userId: $userId
@@ -52,6 +54,8 @@ export const SET_SECOND_PROFILE_PART = gql`
       organization: $organization
       jobPosition: $jobPosition
       education: $education
+      mainDiplomaScan: $mainDiplomaScan
+      gestureDiplomaScan: $gestureDiplomaScan
     ) {
       user {
         id
@@ -61,6 +65,8 @@ export const SET_SECOND_PROFILE_PART = gql`
         organization
         jobPosition
         education
+        mainDiplomaScan
+        gestureDiplomaScan
       }
     }
   }

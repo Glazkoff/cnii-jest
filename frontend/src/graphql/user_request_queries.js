@@ -26,6 +26,8 @@ export const GET_SECOND_PROFILE_PART = gql`
       organization
       jobPosition
       education
+      mainDiplomaScan
+      gestureDiplomaScan
     }
   }
 `;

@@ -4,6 +4,9 @@ from admin_interface.models import Theme
 from .models import CustomUser, Request
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+import math
+
+new_width = 450
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -15,26 +18,35 @@ class CustomUserAdmin(admin.ModelAdmin):
                        'passport_part2_scan_image', ]
 
     def photo_image(self, obj):
+        width = obj.photo.width
+        height = obj.photo.height
+        new_height = math.ceil((height*new_width) / width)
         return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
             url=obj.photo.url,
-            width=obj.photo.width,
-            height=obj.photo.height,
+            width=new_width,
+            height=new_height
         ))
     photo_image.short_description = "Фото"
 
     def passport_part1_scan_image(self, obj):
+        width = obj.passport_part1_scan.width
+        height = obj.passport_part1_scan.height
+        new_height = math.ceil((height*new_width) / width)
         return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
             url=obj.passport_part1_scan.url,
-            width=obj.passport_part1_scan.width,
-            height=obj.passport_part1_scan.height,
+            width=new_width,
+            height=new_height,
         ))
     passport_part1_scan_image.short_description = "Скан паспорта (часть 1) - изображение"
 
     def passport_part2_scan_image(self, obj):
+        width = obj.passport_part2_scan.width
+        height = obj.passport_part2_scan.height
+        new_height = math.ceil((height*new_width) / width)
         return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
             url=obj.passport_part2_scan.url,
-            width=obj.passport_part2_scan.width,
-            height=obj.passport_part2_scan.height,
+            width=new_width,
+            height=new_height,
         ))
     passport_part2_scan_image.short_description = "Скан паспорта (часть 2) - изображение"
 
