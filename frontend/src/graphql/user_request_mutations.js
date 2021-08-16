@@ -127,8 +127,8 @@ export const SET_FOURTH_PROFILE_PART = gql`
 export const SET_FIFTH_PROFILE_PART = gql`
   mutation (
     $userId: ID!
-    $workExperienceFullYears: Int
-    $workExperienceCurrentJob: Int
+    $fullWorkExperienceStartYear: Int
+    $currentJobExperienceStartYear: Int
     $awards: String
     $training: String
     $organizationMembership: String
@@ -137,8 +137,8 @@ export const SET_FIFTH_PROFILE_PART = gql`
   ) {
     setFifthProfilePart(
       userId: $userId
-      workExperienceFullYears: $workExperienceFullYears
-      workExperienceCurrentJob: $workExperienceCurrentJob
+      fullWorkExperienceStartYear: $fullWorkExperienceStartYear
+      currentJobExperienceStartYear: $currentJobExperienceStartYear
       awards: $awards
       training: $training
       organizationMembership: $organizationMembership
@@ -147,8 +147,8 @@ export const SET_FIFTH_PROFILE_PART = gql`
     ) {
       user {
         id
-        workExperienceFullYears
-        workExperienceCurrentJob
+        fullWorkExperienceStartYear
+        currentJobExperienceStartYear
         awards
         training
         organizationMembership

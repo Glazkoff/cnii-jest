@@ -87,6 +87,9 @@
         placeholder="Прикрепите ваше фото"
         label="Ваше фото"
         prepend-icon="mdi-camera"
+        :messages="[
+          'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
+        ]"
         :error-messages="photoErrors"
         v-model="$v.form.photo.$model"
         @input="

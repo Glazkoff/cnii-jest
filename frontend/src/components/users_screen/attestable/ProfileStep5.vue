@@ -8,36 +8,38 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-form ref="form" lazy-validation v-else>
-      <v-text-field
-        label="Стаж полных лет"
-        v-model="$v.form.work_experience_full_years.$model"
-        :error-messages="workExperienceFullYearsErrors"
+      <v-select
+        :items="selectYears()"
+        item-text="text"
+        item-value="value"
+        label="Год начала трудовой деятельности"
+        v-model="$v.form.full_work_experience_start_year.$model"
+        :error-messages="fullWorkExperienceStartYearErrors"
         @input="
-          $v.form.work_experience_full_years.$touch();
+          $v.form.full_work_experience_start_year.$touch();
           sendForm();
         "
         @blur="
-          $v.form.work_experience_full_years.$touch();
+          $v.form.full_work_experience_start_year.$touch();
           sendForm();
         "
-        type="number"
-        required
-      ></v-text-field>
-      <v-text-field
+      ></v-select>
+      <v-select
+        :items="selectYears()"
+        item-text="text"
+        item-value="value"
         label="Стаж настоящей должности"
-        v-model="$v.form.work_experience_current_job.$model"
-        :error-messages="workExperienceCurrentJobErrors"
+        v-model="$v.form.current_job_experience_start_year.$model"
+        :error-messages="currentJobExperienceStartYearErrors"
         @input="
-          $v.form.work_experience_current_job.$touch();
+          $v.form.current_job_experience_start_year.$touch();
           sendForm();
         "
         @blur="
-          $v.form.work_experience_current_job.$touch();
+          $v.form.current_job_experience_start_year.$touch();
           sendForm();
         "
-        type="number"
-        required
-      ></v-text-field>
+      ></v-select>
       <v-textarea
         label="Наличие наград"
         v-model="$v.form.awards.$model"
@@ -95,9 +97,13 @@
       <v-file-input
         chips
         accept="image/png, image/jpeg, image/bmp"
+        :messages="[
+          'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
+        ]"
         placeholder="Прикрепите скан"
         label="Характеристика"
         prepend-icon="mdi-camera"
+        class="mb-2"
         :error-messages="characteristicErrors"
         v-model="$v.form.characteristic.$model"
         @input="sendForm()"
@@ -111,6 +117,7 @@
         prepend-icon="mdi-file-document-outline"
         :error-messages="employmentHistoryErrors"
         v-model="$v.form.employment_history.$model"
+        :messages="['Загрузите в формате pdf']"
       ></v-file-input>
     </v-form>
     <v-btn
@@ -136,8 +143,8 @@
 
 <script>
 // TODO:
-// - work_experience_full_years Стаж полных лет
-// - work_experience_current_job Стаж настоящей должности
+// - full_work_experience_start_year Стаж полных лет
+// - current_job_experience_start_year Стаж настоящей должности
 // - awards Наличие наград
 // - training Повышение квалификации
 // - organization_membership Членство в организациях
@@ -157,11 +164,13 @@ export default {
       circleLoading: false,
       circleLoading2: false,
       form: {
-        work_experience_full_years: null,
-        work_experience_current_job: null,
+        full_work_experience_start_year: null,
+        current_job_experience_start_year: null,
         awards: null,
         training: null,
-        organization_membership: null
+        organization_membership: null,
+        characteristic: null,
+        employment_history: null
       }
     };
   },
@@ -178,13 +187,14 @@ export default {
   watch: {
     user: function (val) {
       if (val) {
-        if (val.workExperienceFullYears) {
-          this.$v.form.$model.work_experience_full_years =
-            val.workExperienceFullYears;
+        if (val.fullWorkExperienceStartYear) {
+          console.log(val.fullWorkExperienceStartYear.split("A_"));
+          this.$v.form.$model.full_work_experience_start_year =
+            val.fullWorkExperienceStartYear.split("A_")[1];
         }
-        if (val.workExperienceCurrentJob) {
-          this.$v.form.$model.work_experience_current_job =
-            val.workExperienceCurrentJob;
+        if (val.currentJobExperienceStartYear) {
+          this.$v.form.$model.current_job_experience_start_year =
+            val.currentJobExperienceStartYear.split("A_")[1];
         }
         if (val.awards) {
           this.$v.form.$model.awards = val.awards;
@@ -235,8 +245,8 @@ export default {
   },
   validations: {
     form: {
-      work_experience_full_years: { required },
-      work_experience_current_job: { required },
+      full_work_experience_start_year: { required },
+      current_job_experience_start_year: { required },
       awards: { required },
       training: { required },
       organization_membership: { required },
@@ -245,17 +255,17 @@ export default {
     }
   },
   computed: {
-    workExperienceFullYearsErrors() {
+    fullWorkExperienceStartYearErrors() {
       const errors = [];
-      if (!this.$v.form.work_experience_full_years.$dirty) return errors;
-      !this.$v.form.work_experience_full_years.required &&
-        errors.push("Поле 'Стаж полных лет' обязательно!");
+      if (!this.$v.form.full_work_experience_start_year.$dirty) return errors;
+      !this.$v.form.full_work_experience_start_year.required &&
+        errors.push("Поле 'Год начада трудовой деятельности' обязательно!");
       return errors;
     },
-    workExperienceCurrentJobErrors() {
+    currentJobExperienceStartYearErrors() {
       const errors = [];
-      if (!this.$v.form.work_experience_current_job.$dirty) return errors;
-      !this.$v.form.work_experience_current_job.required &&
+      if (!this.$v.form.current_job_experience_start_year.$dirty) return errors;
+      !this.$v.form.current_job_experience_start_year.required &&
         errors.push("Поле 'Стаж настоящей должности' обязательно!");
       return errors;
     },
@@ -350,10 +360,10 @@ export default {
             mutation: SET_FIFTH_PROFILE_PART,
             variables: {
               userId: this.$store.getters.decoded.user_id,
-              workExperienceFullYears:
-                this.$v.form.$model.work_experience_full_years,
-              workExperienceCurrentJob:
-                this.$v.form.$model.work_experience_current_job,
+              fullWorkExperienceStartYear:
+                this.$v.form.$model.full_work_experience_start_year,
+              currentJobExperienceStartYear:
+                this.$v.form.$model.current_job_experience_start_year,
               awards: this.$v.form.$model.awards,
               training: this.$v.form.$model.training,
               organizationMembership:
@@ -369,10 +379,10 @@ export default {
                 }
               });
 
-              data.user.workExperienceFullYears =
-                setFifthProfilePart.user.workExperienceFullYears;
-              data.user.workExperienceCurrentJob =
-                setFifthProfilePart.user.workExperienceCurrentJob;
+              data.user.fullWorkExperienceStartYear =
+                setFifthProfilePart.user.fullWorkExperienceStartYear;
+              data.user.currentJobExperienceStartYear =
+                setFifthProfilePart.user.currentJobExperienceStartYear;
               data.user.awards = setFifthProfilePart.user.awards;
               data.user.training = setFifthProfilePart.user.training;
               data.user.organizationMembership =
@@ -394,6 +404,13 @@ export default {
             reject(err);
           });
       });
+    },
+    selectYears() {
+      let yearArr = [];
+      for (let year = new Date().getFullYear(); year >= 1950; year--) {
+        yearArr.push({ text: "" + year, value: "" + year });
+      }
+      return yearArr;
     }
   }
 };

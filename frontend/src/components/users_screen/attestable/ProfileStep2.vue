@@ -104,6 +104,9 @@
         placeholder="Прикрепите скан"
         label="Скан диплома об образовании"
         prepend-icon="mdi-camera"
+        :messages="[
+          'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
+        ]"
         :error-messages="mainDiplomaErrors"
         v-model="$v.form.main_diploma_scan.$model"
         @input="sendForm()"
@@ -115,6 +118,9 @@
         placeholder="Прикрепите скан"
         label="Скан диплома о подготовке по жестовому языку"
         prepend-icon="mdi-camera"
+        :messages="[
+          'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
+        ]"
         :error-messages="gestureDiplomaErrors"
         v-model="$v.form.gesture_diploma_scan.$model"
         @input="sendForm()"

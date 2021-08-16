@@ -1,6 +1,17 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
+
+
+def year_choices():
+    choices = ()
+    for r in range(1950, datetime.date.today().year+1):
+        choices = choices+((r, r),)
+    return tuple(choices)
+
+
+def current_year():
+    return datetime.date.today().year
 
 
 class CustomUser(models.Model):
@@ -45,10 +56,10 @@ class CustomUser(models.Model):
         "Домашний телефон", max_length=150, blank=True)
     work_phone = models.CharField(
         "Рабочий телефон", max_length=150, blank=True)
-    work_experience_full_years = models.IntegerField(
-        "Стаж полных лет", blank=True, null=True)
-    work_experience_current_job = models.IntegerField(
-        "Стаж настоящей должности", blank=True, null=True)
+    full_work_experience_start_year = models.IntegerField(
+        "Год начала трудовой деятельности", choices=year_choices(), blank=True)
+    current_job_experience_start_year = models.IntegerField(
+        "Год начала текущей трудовой деятельности", choices=year_choices(), blank=True)
     awards = models.TextField("Наличие наград", blank=True)
     training = models.TextField("Повышение квалификации", blank=True)
     organization_membership = models.TextField(
@@ -79,7 +90,7 @@ class CustomUser(models.Model):
 class Request(models.Model):
     """Заявка"""
     STATUS_CHOICES = (("step_1", "Шаг 1"), ("step_2", "Шаг 2"),
-                      ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"),("step_6", "Шаг 6"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
+                      ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"), ("step_6", "Шаг 6"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
     request_number = models.CharField(
         verbose_name="Номер заявки", max_length=10)
     user = models.ForeignKey(

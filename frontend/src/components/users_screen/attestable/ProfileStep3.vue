@@ -27,6 +27,9 @@
         chips
         accept="image/png, image/jpeg, image/bmp"
         placeholder="Прикрепите скан"
+        :messages="[
+          'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
+        ]"
         label="Скан паспорта - страницы 2-3 (разворот с фотографией)"
         prepend-icon="mdi-camera"
         :error-messages="passportPart1ScanErrors"
@@ -40,6 +43,9 @@
         placeholder="Прикрепите скан"
         label="Скан паспорта - страницы 4-5 (разворот с фотографией)"
         prepend-icon="mdi-camera"
+        :messages="[
+          'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
+        ]"
         :error-messages="passportPart2ScanErrors"
         v-model="$v.form.passport_part2_scan.$model"
         @input="sendForm()"

@@ -62,8 +62,8 @@ export const GET_FIFTH_PROFILE_PART = gql`
   query ($userId: ID!) {
     user(userId: $userId) {
       id
-      workExperienceFullYears
-      workExperienceCurrentJob
+      fullWorkExperienceStartYear
+      currentJobExperienceStartYear
       awards
       training
       organizationMembership

@@ -199,8 +199,8 @@ class SetFourthProfilePartMutation(graphene.Mutation):
 class SetFifthProfilePartMutation(graphene.Mutation):
     class Arguments:
         user_id = graphene.ID(required=True)
-        work_experience_full_years = graphene.Int()
-        work_experience_current_job = graphene.Int()
+        full_work_experience_start_year = graphene.Int()
+        current_job_experience_start_year = graphene.Int()
         awards = graphene.String()
         training = graphene.String()
         organization_membership = graphene.String()
@@ -210,15 +210,15 @@ class SetFifthProfilePartMutation(graphene.Mutation):
     user = graphene.Field(CustomUserType)
 
     @classmethod
-    def mutate(cls, root, info, user_id, work_experience_full_years=None, work_experience_current_job=None, awards=None, training=None, organization_membership=None, characteristic=None, employment_history=None):
+    def mutate(cls, root, info, user_id, full_work_experience_start_year=None, current_job_experience_start_year=None, awards=None, training=None, organization_membership=None, characteristic=None, employment_history=None):
         try:
             now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
             user = User.objects.get(pk=user_id)
             custom_user = CustomUser.objects.get_or_create(user=user)
-            if work_experience_full_years is not None:
-                custom_user[0].work_experience_full_years = work_experience_full_years
-            if work_experience_current_job is not None:
-                custom_user[0].work_experience_current_job = work_experience_current_job
+            if full_work_experience_start_year is not None:
+                custom_user[0].full_work_experience_start_year = full_work_experience_start_year
+            if current_job_experience_start_year is not None:
+                custom_user[0].current_job_experience_start_year = current_job_experience_start_year
             if awards is not None:
                 custom_user[0].awards = awards
             if training is not None:
