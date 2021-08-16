@@ -159,6 +159,30 @@ export const SET_FIFTH_PROFILE_PART = gql`
   }
 `;
 
+// Мутация для отправки данных шестого шага
+export const SET_SIXTH_PROFILE_PART = gql`
+  mutation (
+    $userId: ID!
+    $attestationCertificateNumber: String
+    $attestationCertificateDate: Date
+    $attestationCertificateScan: Upload
+  ) {
+    setSixthProfilePart(
+      userId: $userId
+      attestationCertificateNumber: $attestationCertificateNumber
+      attestationCertificateDate: $attestationCertificateDate
+      attestationCertificateScan: $attestationCertificateScan
+    ) {
+      user {
+        id
+        attestationCertificateNumber
+        attestationCertificateDate
+        attestationCertificateScan
+      }
+    }
+  }
+`;
+
 // Мутация для обновления данных шага
 export const UPDATE_REQUEST_STATUS = gql`
   mutation ($requestId: ID!, $statusNumber: Int!) {

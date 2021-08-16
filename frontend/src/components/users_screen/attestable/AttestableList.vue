@@ -82,6 +82,21 @@ export default {
             case "STEP_5":
               el.status = "Шаг 5";
               break;
+            case "STEP_6":
+              el.status = "Шаг 6";
+              break;
+            case "ON_CHECK":
+              el.status = "Отправлена на проверку";
+              break;
+            case "CANCELED":
+              el.status = "Отклонена";
+              break;
+            case "CONFIRMED":
+              el.status = "Успешно подтверждена";
+              break;
+            case "COMPLETED":
+              el.status = "Завершена работа";
+              break;
             default:
               console.log(el.status);
               el.status = "-";

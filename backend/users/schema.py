@@ -2,7 +2,7 @@ import graphene
 from django.contrib.auth.models import User
 from .models import CustomUser, Request
 from .types import CustomUserType, RequestType
-from .mutations import SetFirstProfilePartMutation, SetSecondProfilePartMutation, SetThirdProfilePartMutation, SetFourthProfilePartMutation, SetFifthProfilePartMutation, UpdateRequestStatusMutation, FinishRequestMutation
+from .mutations import SetFirstProfilePartMutation, SetSecondProfilePartMutation, SetThirdProfilePartMutation, SetFourthProfilePartMutation, SetFifthProfilePartMutation, SetSixthProfilePartMutation, UpdateRequestStatusMutation, FinishRequestMutation
 import graphene_django_optimizer as gql_optimizer
 
 
@@ -41,6 +41,7 @@ class Mutation(graphene.ObjectType):
     set_third_profile_part = SetThirdProfilePartMutation.Field()
     set_fourth_profile_part = SetFourthProfilePartMutation.Field()
     set_fifth_profile_part = SetFifthProfilePartMutation.Field()
+    set_sixth_profile_part = SetSixthProfilePartMutation.Field()
     update_request_status = UpdateRequestStatusMutation.Field()
     finish_request = FinishRequestMutation.Field()
 

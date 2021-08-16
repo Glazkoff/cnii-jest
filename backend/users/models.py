@@ -49,14 +49,20 @@ class CustomUser(models.Model):
         "Стаж полных лет", blank=True, null=True)
     work_experience_current_job = models.IntegerField(
         "Стаж настоящей должности", blank=True, null=True)
-    employment_history = models.FileField(
-        verbose_name="Заверенная копия трудовой книжки (все страницы)", upload_to='employment_history', blank=True)
     awards = models.TextField("Наличие наград", blank=True)
     training = models.TextField("Повышение квалификации", blank=True)
     organization_membership = models.TextField(
         "Членство в организациях", blank=True)
     characteristic = models.ImageField(verbose_name="Характеристика",
                                        upload_to='characteristic', blank=True)
+    employment_history = models.FileField(
+        verbose_name="Заверенная копия трудовой книжки (все страницы)", upload_to='employment_history', blank=True)
+    attestation_certificate_number = models.CharField(
+        "Номер сертификата аттестации", max_length=150, blank=True)
+    attestation_certificate_date = models.DateField(
+        "Дата выдачи сертификата аттестации", blank=True, null=True)
+    attestation_certificate_scan = models.ImageField(verbose_name="Скан сертификата аттестации",
+                                                     upload_to='attestation_certificate', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -73,7 +79,7 @@ class CustomUser(models.Model):
 class Request(models.Model):
     """Заявка"""
     STATUS_CHOICES = (("step_1", "Шаг 1"), ("step_2", "Шаг 2"),
-                      ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
+                      ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"),("step_6", "Шаг 6"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
     request_number = models.CharField(
         verbose_name="Номер заявки", max_length=10)
     user = models.ForeignKey(

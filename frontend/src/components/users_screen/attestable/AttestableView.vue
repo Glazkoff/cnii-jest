@@ -56,8 +56,18 @@
       <v-stepper-content step="5">
         <ProfileStep5
           @goToPrevStep="stepperStatus = 4"
-          @goToNextStep="finishEditing()"
+          @goToNextStep="stepperStatus = 6"
         ></ProfileStep5>
+      </v-stepper-content>
+
+      <v-stepper-step step="6" :complete="stepperStatus >= 6">
+        Шаг 6. Теоретическая часть аттестации
+      </v-stepper-step>
+      <v-stepper-content step="6">
+        <ProfileStep6
+          @goToPrevStep="stepperStatus = 5"
+          @goToNextStep="finishEditing()"
+        ></ProfileStep6>
       </v-stepper-content>
     </v-stepper>
     <SendingConfirmationDialog
@@ -73,6 +83,7 @@ import ProfileStep2 from "./ProfileStep2";
 import ProfileStep3 from "./ProfileStep3";
 import ProfileStep4 from "./ProfileStep4";
 import ProfileStep5 from "./ProfileStep5";
+import ProfileStep6 from "./ProfileStep6";
 import SendingConfirmationDialog from "./SendingConfirmationDialog";
 import { REQUEST_STATUS } from "@/graphql/user_request_queries.js";
 import { FINISH_REQUEST } from "@/graphql/user_request_mutations.js";
@@ -84,6 +95,7 @@ export default {
     ProfileStep3,
     ProfileStep4,
     ProfileStep5,
+    ProfileStep6,
     SendingConfirmationDialog
   },
   data() {
@@ -121,6 +133,9 @@ export default {
             break;
           case "STEP_5":
             this.stepperStatus = 5;
+            break;
+          case "STEP_6":
+            this.stepperStatus = 6;
             break;
           default:
             break;

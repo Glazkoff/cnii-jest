@@ -120,7 +120,7 @@
       @click="goToNextStep"
       v-if="!this.$apollo.queries.user.loading"
     >
-      Отправить
+      Далее
     </v-btn>
     <v-btn
       text
@@ -320,8 +320,10 @@ export default {
         this.formLoading = true;
         this.sendForm()
           .then(() => {
-            this.$emit("goToNextStep");
-            this.formLoading = false;
+            this.sendCurrentStep(6).finally(() => {
+              this.$emit("goToNextStep");
+              this.formLoading = false;
+            });
           })
           .catch(() => {
             this.formLoading = false;
@@ -342,7 +344,6 @@ export default {
         });
     },
     sendForm() {
-      console.log(this.$v.form.$model.characteristic);
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({

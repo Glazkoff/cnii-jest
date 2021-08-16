@@ -73,6 +73,18 @@ export const GET_FIFTH_PROFILE_PART = gql`
   }
 `;
 
+// Запрос данных для шестого шага
+export const GET_SIXTH_PROFILE_PART = gql`
+  query ($userId: ID!) {
+    user(userId: $userId) {
+      id
+      attestationCertificateNumber
+      attestationCertificateDate
+      attestationCertificateScan
+    }
+  }
+`;
+
 // Запрос списка заявок одного пользователя
 export const USER_REQUESTS = gql`
   query ($userId: ID!) {
