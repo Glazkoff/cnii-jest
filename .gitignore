@@ -24,3 +24,17 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
+/backend/media/attestation_certificate/*
+/backend/media/characteristic/*
+/backend/media/employment_history/*
+/backend/media/gesture_diploma/*
+/backend/media/main_diploma/*
+/backend/media/passport_part1/*
+/backend/media/passport_part2/*
+/backend/media/photo/*
+
+
+
+
+
