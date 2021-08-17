@@ -70,10 +70,6 @@
         ></ProfileStep6>
       </v-stepper-content>
     </v-stepper>
-    <SendingConfirmationDialog
-      :dialog="confirmationDialog"
-      @close="confirmationDialog = false"
-    ></SendingConfirmationDialog>
   </div>
 </template>
 
@@ -84,7 +80,6 @@ import ProfileStep3 from "./ProfileStep3";
 import ProfileStep4 from "./ProfileStep4";
 import ProfileStep5 from "./ProfileStep5";
 import ProfileStep6 from "./ProfileStep6";
-import SendingConfirmationDialog from "./SendingConfirmationDialog";
 import { REQUEST_STATUS } from "@/graphql/user_request_queries.js";
 import { FINISH_REQUEST } from "@/graphql/user_request_mutations.js";
 export default {
@@ -95,13 +90,11 @@ export default {
     ProfileStep3,
     ProfileStep4,
     ProfileStep5,
-    ProfileStep6,
-    SendingConfirmationDialog
+    ProfileStep6
   },
   data() {
     return {
       stepperStatus: 1,
-      confirmationDialog: false,
       stepperLoading: false
     };
   },
@@ -152,8 +145,14 @@ export default {
           variables: { requestId: this.$route.params.id }
         })
         .then(() => {
+          this.$store.commit("OPEN_SUCCESS_DIALOG");
+          this.$router.push("/");
+        })
+        .catch(() => {
+          this.$store.commit("OPEN_ERROR_DIALOG");
+        })
+        .finally(() => {
           this.stepperLoading = false;
-          this.confirmationDialog = true;
         });
     }
   }

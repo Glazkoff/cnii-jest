@@ -422,7 +422,7 @@ export default {
                   userId: this.$store.getters.user_id
                 }
               });
-              console.log("setFifthProfilePart", setFifthProfilePart);
+
               data.user.fullWorkExperienceStartYear =
                 setFifthProfilePart.user.fullWorkExperienceStartYear;
               data.user.currentJobExperienceStartYear =

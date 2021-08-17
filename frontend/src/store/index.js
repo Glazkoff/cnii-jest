@@ -10,7 +10,9 @@ export default new Vuex.Store({
     access_token: null,
     refresh_token: localStorage.getItem("t") || null,
     first_path: null,
-    loading: false
+    loading: false,
+    successRequestDialog: false,
+    errorRequestDialog: false
   },
   getters: {
     decoded: state => {
@@ -51,6 +53,18 @@ export default new Vuex.Store({
     },
     SET_FIRST_PATH(state, firstPath) {
       state.firstPath = firstPath;
+    },
+    CLOSE_SUCCESS_DIALOG(state) {
+      state.successRequestDialog = false;
+    },
+    CLOSE_ERROR_DIALOG(state) {
+      state.errorRequestDialog = false;
+    },
+    OPEN_SUCCESS_DIALOG(state) {
+      state.successRequestDialog = true;
+    },
+    OPEN_ERROR_DIALOG(state) {
+      state.errorRequestDialog = true;
     }
   },
   actions: {

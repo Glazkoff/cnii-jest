@@ -1,5 +1,8 @@
 <template>
   <div>
+    <SendingConfirmationDialog
+      @close.prevent="$store.commit('CLOSE_SUCCESS_DIALOG')"
+    ></SendingConfirmationDialog>
     <h1>Ваши заявки</h1>
     <v-data-table :headers="headers" :items="items">
       <template v-slot:item="row">
@@ -29,9 +32,13 @@
 
 <script>
 import { USER_REQUESTS } from "@/graphql/user_request_queries.js";
+import SendingConfirmationDialog from "./SendingConfirmationDialog";
 
 export default {
   name: "AttestableList",
+  components: {
+    SendingConfirmationDialog
+  },
   data() {
     return {
       headers: [
@@ -64,8 +71,11 @@ export default {
   },
   computed: {
     items() {
+      console.log(this.userRequests);
       if (this.userRequests !== undefined) {
-        return this.userRequests.map(el => {
+        let reqArr = [...this.userRequests];
+        return reqArr.map(el => {
+          console.log(el.status.toUpperCase());
           switch (el.status.toUpperCase()) {
             case "STEP_1":
               el.status = "Шаг 1";
@@ -98,7 +108,6 @@ export default {
               el.status = "Завершена работа";
               break;
             default:
-              console.log(el.status);
               el.status = "-";
               break;
           }
@@ -107,6 +116,9 @@ export default {
       } else {
         return this.userRequests;
       }
+    },
+    showSuccessDialog() {
+      return this.$store.state.successRequestDialog;
     }
   }
 };

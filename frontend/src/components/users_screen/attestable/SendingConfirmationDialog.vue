@@ -2,20 +2,20 @@
   <div class="text-center">
     <v-dialog v-model="innerDialog" width="500">
       <v-card>
-        <v-card-text>
-          <div class="text-center">
-            <v-icon large color="primary"> mdi-check-circle-outline </v-icon>
+        <v-card-text class="pt-4">
+          <div class="text-center pb-2">
+            <v-icon x-large color="success"> mdi-check-circle-outline </v-icon>
           </div>
-          <div class="text-center">Вы успешно отправили заявку!</div>
+          <div class="text-center mt-2">
+            <h2>Вы успешно отправили заявку!</h2>
+          </div>
         </v-card-text>
 
         <v-divider></v-divider>
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="$emit('close')">
-            Отправить
-          </v-btn>
+          <v-btn color="primary" text @click="$emit('close')"> Закрыть </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -25,18 +25,14 @@
 <script>
 export default {
   name: "SendingConfirmationDialog",
-  props: ["dialog"],
   data() {
     return {
-      innerDialog: false
+      innerDialog: this.$store.state.successRequestDialog
     };
   },
   watch: {
-    dialog(val) {
-      this.innerDialog = val;
-      if (val == false) {
-        this.$emit("close");
-      }
+    "$store.state.successRequestDialog"() {
+      this.innerDialog = this.$store.state.successRequestDialog;
     }
   }
 };
