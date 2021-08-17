@@ -81,7 +81,40 @@
           sendForm();
         "
       ></v-select>
+      <div v-if="user.photo && !uploadPhoto">
+        <small>Ваше фото</small><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadPhoto = true;
+            user.photo = null;
+            $v.form.photo.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${user.photo}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
       <v-file-input
+        v-else
         chips
         accept="image/png, image/jpeg, image/bmp"
         placeholder="Прикрепите ваше фото"
@@ -90,6 +123,7 @@
         :messages="[
           'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
         ]"
+        class="mb-2"
         :error-messages="photoErrors"
         v-model="$v.form.photo.$model"
         @input="
@@ -115,7 +149,7 @@
 </template>
 
 <script>
-import { required } from "vuelidate/lib/validators";
+import { required, requiredIf } from "vuelidate/lib/validators";
 import DatePicker from "../../global/DatePicker.vue";
 import {
   SET_FIRST_PROFILE_PART,
@@ -132,12 +166,14 @@ export default {
     return {
       formLoading: false,
       circleLoading: false,
+      uploadPhoto: false,
       form: {
         surname: null,
         name: null,
         patricity: null,
         birthday: null,
-        sex: null
+        sex: null,
+        photo: null
       }
     };
   },
@@ -169,21 +205,6 @@ export default {
         if (val.birthday) {
           this.$v.form.$model.birthday = val.birthday;
         }
-        if (val.photo) {
-          this.circleLoading = true;
-          this.$http({
-            url: "/media/" + val.photo,
-            method: "GET",
-            responseType: "blob"
-          }).then(response => {
-            this.$v.form.$model.photo = new File(
-              [response.data],
-              val.photo.split("/")[val.photo.split("/").length - 1]
-            );
-            this.circleLoading = false;
-            this.$v.form.photo.$touch();
-          });
-        }
       }
     }
   },
@@ -194,7 +215,11 @@ export default {
       patricity: {},
       birthday: { required },
       sex: { required },
-      photo: { required }
+      photo: {
+        required: requiredIf(function () {
+          return !this.user.photo || this.uploadPhoto;
+        })
+      }
     }
   },
   computed: {
@@ -232,7 +257,9 @@ export default {
     photoErrors() {
       const errors = [];
       if (!this.$v.form.photo.$dirty) return errors;
-      !this.$v.form.photo.required && errors.push("Поле 'Фото' обязательно");
+      !this.$v.form.photo.required &&
+        !(this.user.photo || !this.uploadPhoto) &&
+        errors.push("Поле 'Фото' обязательно");
       return errors;
     },
     predefinedBirthday() {
@@ -283,6 +310,9 @@ export default {
       }
     },
     sendForm() {
+      if (this.$v.form.$model.photo) {
+        this.uploadPhoto = false;
+      }
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({
@@ -309,6 +339,7 @@ export default {
               data.user.patricity = setFirstProfilePart.user.patricity;
               data.user.birthday = setFirstProfilePart.user.birthday;
               data.user.sex = setFirstProfilePart.user.sex;
+              data.user.photo = setFirstProfilePart.user.photo;
 
               cache.writeQuery({
                 query: GET_FIRST_PROFILE_PART,

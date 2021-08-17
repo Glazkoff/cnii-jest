@@ -57,9 +57,9 @@ class CustomUser(models.Model):
     work_phone = models.CharField(
         "Рабочий телефон", max_length=150, blank=True)
     full_work_experience_start_year = models.IntegerField(
-        "Год начала трудовой деятельности", choices=year_choices(), blank=True)
+        "Год начала трудовой деятельности", choices=year_choices(), default=current_year(), blank=True)
     current_job_experience_start_year = models.IntegerField(
-        "Год начала текущей трудовой деятельности", choices=year_choices(), blank=True)
+        "Год начала текущей трудовой деятельности", choices=year_choices(), default=current_year(), blank=True)
     awards = models.TextField("Наличие наград", blank=True)
     training = models.TextField("Повышение квалификации", blank=True)
     organization_membership = models.TextField(
@@ -67,7 +67,7 @@ class CustomUser(models.Model):
     characteristic = models.ImageField(verbose_name="Характеристика",
                                        upload_to='characteristic', blank=True)
     employment_history = models.FileField(
-        verbose_name="Заверенная копия трудовой книжки (все страницы)", upload_to='employment_history', blank=True)
+        verbose_name="Заверенная копия трудовой книжки (все страницы)", upload_to='employment_history', blank=True, help_text="Прикрепите документ в формате pdf")
     attestation_certificate_number = models.CharField(
         "Номер сертификата аттестации", max_length=150, blank=True)
     attestation_certificate_date = models.DateField(

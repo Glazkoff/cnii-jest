@@ -23,13 +23,51 @@
         "
         required
       ></v-text-field>
+      <div
+        class="mb-4"
+        v-if="user.passportPart1Scan && !uploadPassportPart1Scan"
+      >
+        <small>Скан паспорта - страницы 2-3 (разворот с фотографией)</small
+        ><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadPassportPart1Scan = true;
+            user.passportPart1Scan = null;
+            $v.form.passport_part1_scan.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${user.passportPart1Scan}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
       <v-file-input
+        v-else
         chips
         accept="image/png, image/jpeg, image/bmp"
         placeholder="Прикрепите скан"
         :messages="[
           'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
         ]"
+        class="mb-2"
         label="Скан паспорта - страницы 2-3 (разворот с фотографией)"
         prepend-icon="mdi-camera"
         :error-messages="passportPart1ScanErrors"
@@ -37,7 +75,44 @@
         @input="sendForm()"
         @blur="sendForm()"
       ></v-file-input>
+      <div
+        class="mb-4"
+        v-if="user.passportPart2Scan && !uploadPassportPart2Scan"
+      >
+        <small>Скан паспорта - страницы 4-5 (разворот с фотографией)</small
+        ><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadPassportPart2Scan = true;
+            user.passportPart2Scan = null;
+            $v.form.passport_part2_scan.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${user.passportPart2Scan}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
       <v-file-input
+        v-else
         chips
         accept="image/png, image/jpeg, image/bmp"
         placeholder="Прикрепите скан"
@@ -83,7 +158,7 @@
 // - passport_part1_scan Скан паспорта (часть 1)
 // - passport_part2_scan Скан паспорта (часть 2)
 
-import { required } from "vuelidate/lib/validators";
+import { required, requiredIf } from "vuelidate/lib/validators";
 import {
   SET_THIRD_PROFILE_PART,
   UPDATE_REQUEST_STATUS
@@ -97,6 +172,8 @@ export default {
       formLoading: false,
       circleLoading1: false,
       circleLoading2: false,
+      uploadPassportPart1Scan: false,
+      uploadPassportPart2Scan: false,
       form: {
         passport: null,
         passport_part1_scan: null,
@@ -120,48 +197,22 @@ export default {
         if (val.passport) {
           this.$v.form.$model.passport = val.passport;
         }
-        if (val.passportPart1Scan) {
-          this.circleLoading1 = true;
-          this.$http({
-            url: "/media/" + val.passportPart1Scan,
-            method: "GET",
-            responseType: "blob"
-          }).then(response => {
-            this.$v.form.$model.passport_part1_scan = new File(
-              [response.data],
-              val.passportPart1Scan.split("/")[
-                val.passportPart1Scan.split("/").length - 1
-              ]
-            );
-            this.circleLoading1 = false;
-            this.$v.form.passport_part1_scan.$touch();
-          });
-        }
-        if (val.passportPart2Scan) {
-          this.circleLoading2 = true;
-          this.$http({
-            url: "/media/" + val.passportPart1Scan,
-            method: "GET",
-            responseType: "blob"
-          }).then(response => {
-            this.$v.form.$model.passport_part2_scan = new File(
-              [response.data],
-              val.passportPart2Scan.split("/")[
-                val.passportPart2Scan.split("/").length - 1
-              ]
-            );
-            this.circleLoading2 = false;
-            this.$v.form.passport_part2_scan.$touch();
-          });
-        }
       }
     }
   },
   validations: {
     form: {
       passport: { required },
-      passport_part1_scan: { required },
-      passport_part2_scan: { required }
+      passport_part1_scan: {
+        required: requiredIf(function () {
+          return !this.user.passportPart1Scan || this.uploadPassportPart1Scan;
+        })
+      },
+      passport_part2_scan: {
+        required: requiredIf(function () {
+          return !this.user.passportPart2Scan || this.uploadPassportPart2Scan;
+        })
+      }
     }
   },
   computed: {
@@ -176,6 +227,7 @@ export default {
       const errors = [];
       if (!this.$v.form.passport_part1_scan.$dirty) return errors;
       !this.$v.form.passport_part1_scan.required &&
+        !(this.user.passportPart1Scan || !this.uploadPassportPart1Scan) &&
         errors.push("Поле 'Скан паспорта (часть 1)' обязательно!");
       return errors;
     },
@@ -183,6 +235,7 @@ export default {
       const errors = [];
       if (!this.$v.form.passport_part2_scan.$dirty) return errors;
       !this.$v.form.passport_part2_scan.required &&
+        !(this.user.passportPart2Scan || !this.uploadPassportPart2Scan) &&
         errors.push("Поле 'Скан паспорта (часть 2)' обязательно!");
       return errors;
     }
@@ -236,6 +289,12 @@ export default {
         });
     },
     sendForm() {
+      if (this.$v.form.$model.passport_part1_scan) {
+        this.uploadPassportPart1Scan = false;
+      }
+      if (this.$v.form.$model.passport_part2_scan) {
+        this.uploadPassportPart2Scan = false;
+      }
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({
@@ -255,6 +314,10 @@ export default {
               });
 
               data.user.passport = setThirdProfilePart.user.passport;
+              data.user.passportPart1Scan =
+                setThirdProfilePart.user.passportPart1Scan;
+              data.user.passportPart2Scan =
+                setThirdProfilePart.user.passportPart2Scan;
 
               cache.writeQuery({
                 query: GET_THIRD_PROFILE_PART,

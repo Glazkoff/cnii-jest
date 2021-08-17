@@ -17,7 +17,8 @@ class Query(graphene.ObjectType):
 
     def resolve_user(self, info, user_id):
         try:
-            return CustomUser.objects.get(pk=user_id)
+            user = User.objects.get(pk=user_id)
+            return CustomUser.objects.get(user=user)
         except (CustomUser.DoesNotExist,):
             return None
 

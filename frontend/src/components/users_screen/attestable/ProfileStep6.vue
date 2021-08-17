@@ -34,7 +34,45 @@
         :max="new Date().toISOString().slice(0, 10)"
         :predefined="predefinedAttestationСertificateDate"
       ></DatePicker>
+      <div
+        class="mb-4"
+        v-if="
+          user.attestationCertificateScan && !uploadAttestationCertificateScan
+        "
+      >
+        <small>Скан сертификата аттестации</small><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadAttestationCertificateScan = true;
+            user.attestationCertificateScan = null;
+            $v.form.attestation_certificate_scan.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${user.attestationCertificateScan}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
       <v-file-input
+        v-else
         chips
         accept="image/png, image/jpeg, image/bmp"
         placeholder="Прикрепите скан"
@@ -68,7 +106,7 @@
 </template>
 
 <script>
-import { required } from "vuelidate/lib/validators";
+import { required, requiredIf } from "vuelidate/lib/validators";
 import {
   SET_SIXTH_PROFILE_PART,
   UPDATE_REQUEST_STATUS
@@ -86,6 +124,7 @@ export default {
       formLoading: false,
       circleLoading1: false,
       circleLoading2: false,
+      uploadAttestationCertificateScan: false,
       form: {
         attestation_certificate_number: null,
         attestation_certificate_date: null,
@@ -113,30 +152,20 @@ export default {
         this.$v.form.$model.attestation_certificate_date =
           val.attestationCertificateDate;
       }
-      if (val.attestationCertificateScan) {
-        this.circleLoading1 = true;
-        this.$http({
-          url: "/media/" + val.attestationCertificateScan,
-          method: "GET",
-          responseType: "blob"
-        }).then(response => {
-          this.$v.form.$model.attestation_certificate_scan = new File(
-            [response.data],
-            val.attestationCertificateScan.split("/")[
-              val.attestationCertificateScan.split("/").length - 1
-            ]
-          );
-          this.circleLoading1 = false;
-          this.$v.form.attestation_certificate_scan.$touch();
-        });
-      }
     }
   },
   validations: {
     form: {
       attestation_certificate_number: { required },
       attestation_certificate_date: { required },
-      attestation_certificate_scan: { required }
+      attestation_certificate_scan: {
+        required: requiredIf(function () {
+          return (
+            !this.user.attestationCertificateScan ||
+            this.uploadAttestationCertificateScan
+          );
+        })
+      }
     }
   },
   computed: {
@@ -158,6 +187,10 @@ export default {
       const errors = [];
       if (!this.$v.form.attestation_certificate_scan.$dirty) return errors;
       !this.$v.form.attestation_certificate_scan.required &&
+        !(
+          this.user.attestationCertificateScan ||
+          !this.uploadAttestationCertificateScan
+        ) &&
         errors.push("Поле 'Скан сертификата аттестации' обязательно!");
       return errors;
     },
@@ -220,6 +253,9 @@ export default {
         });
     },
     sendForm() {
+      if (this.$v.form.$model.attestation_certificate_scan) {
+        this.uploadAttestationCertificateScan = false;
+      }
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({

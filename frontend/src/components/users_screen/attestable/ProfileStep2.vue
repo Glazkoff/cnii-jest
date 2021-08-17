@@ -98,7 +98,40 @@
         "
         required
       ></v-text-field>
+      <div class="mb-4" v-if="user.mainDiplomaScan && !uploadMainDiplomaScan">
+        <small>Скан диплома об образовании</small><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadMainDiplomaScan = true;
+            user.mainDiplomaScan = null;
+            $v.form.main_diploma_scan.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${user.mainDiplomaScan}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
       <v-file-input
+        v-else
         chips
         accept="image/png, image/jpeg, image/bmp"
         placeholder="Прикрепите скан"
@@ -107,12 +140,49 @@
         :messages="[
           'Загрузите в формате png, jpeg, jpg, pjp, pjpeg, jfif, bmp'
         ]"
+        class="mb-2"
         :error-messages="mainDiplomaErrors"
         v-model="$v.form.main_diploma_scan.$model"
         @input="sendForm()"
         @blur="sendForm()"
       ></v-file-input>
+      <div
+        class="mb-2"
+        v-if="user.gestureDiplomaScan && !uploadGestureDiplomaScan"
+      >
+        <small>Скан диплома о подготовке по жестовому языку</small><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadGestureDiplomaScan = true;
+            user.gestureDiplomaScan = null;
+            $v.form.gesture_diploma_scan.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${user.gestureDiplomaScan}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
       <v-file-input
+        v-else
         chips
         accept="image/png, image/jpeg, image/bmp"
         placeholder="Прикрепите скан"
@@ -123,8 +193,14 @@
         ]"
         :error-messages="gestureDiplomaErrors"
         v-model="$v.form.gesture_diploma_scan.$model"
-        @input="sendForm()"
-        @blur="sendForm()"
+        @input="
+          $v.form.gesture_diploma_scan.$touch();
+          sendForm();
+        "
+        @blur="
+          $v.form.gesture_diploma_scan.$touch();
+          sendForm();
+        "
       ></v-file-input>
     </v-form>
     <v-btn
@@ -156,7 +232,7 @@
 // - job_position Занимаемая должность
 // - education Образование
 
-import { required } from "vuelidate/lib/validators";
+import { required, requiredIf } from "vuelidate/lib/validators";
 import {
   SET_SECOND_PROFILE_PART,
   UPDATE_REQUEST_STATUS
@@ -170,6 +246,8 @@ export default {
       formLoading: false,
       circleLoading1: false,
       circleLoading2: false,
+      uploadMainDiplomaScan: false,
+      uploadGestureDiplomaScan: false,
       form: {
         native_language: null,
         citizenship: null,
@@ -213,40 +291,6 @@ export default {
         if (val.education) {
           this.$v.form.$model.education = val.education;
         }
-        if (val.mainDiplomaScan) {
-          this.circleLoading1 = true;
-          this.$http({
-            url: "/media/" + val.mainDiplomaScan,
-            method: "GET",
-            responseType: "blob"
-          }).then(response => {
-            this.$v.form.$model.main_diploma_scan = new File(
-              [response.data],
-              val.mainDiplomaScan.split("/")[
-                val.mainDiplomaScan.split("/").length - 1
-              ]
-            );
-            this.circleLoading1 = false;
-            this.$v.form.main_diploma_scan.$touch();
-          });
-        }
-        if (val.gestureDiplomaScan) {
-          this.circleLoading2 = true;
-          this.$http({
-            url: "/media/" + val.gestureDiplomaScan,
-            method: "GET",
-            responseType: "blob"
-          }).then(response => {
-            this.$v.form.$model.gesture_diploma_scan = new File(
-              [response.data],
-              val.gestureDiplomaScan.split("/")[
-                val.gestureDiplomaScan.split("/").length - 1
-              ]
-            );
-            this.circleLoading2 = false;
-            this.$v.form.gesture_diploma_scan.$touch();
-          });
-        }
       }
     }
   },
@@ -258,8 +302,16 @@ export default {
       organization: { required },
       job_position: { required },
       education: { required },
-      main_diploma_scan: { required },
-      gesture_diploma_scan: { required }
+      main_diploma_scan: {
+        required: requiredIf(function () {
+          return !this.user.mainDiplomaScan || this.uploadMainDiplomaScan;
+        })
+      },
+      gesture_diploma_scan: {
+        required: requiredIf(function () {
+          return !this.user.gestureDiplomaScan || this.uploadGestureDiplomaScan;
+        })
+      }
     }
   },
   computed: {
@@ -310,6 +362,7 @@ export default {
       const errors = [];
       if (!this.$v.form.main_diploma_scan.$dirty) return errors;
       !this.$v.form.main_diploma_scan.required &&
+        !(this.user.mainDiplomaScan || !this.uploadMainDiplomaScan) &&
         errors.push("Поле 'Диплом об образовании' обязательно!");
       return errors;
     },
@@ -317,6 +370,7 @@ export default {
       const errors = [];
       if (!this.$v.form.gesture_diploma_scan.$dirty) return errors;
       !this.$v.form.gesture_diploma_scan.required &&
+        !(this.user.gestureDiplomaScan || !this.uploadGestureDiplomaScan) &&
         errors.push("Поле 'Диплом об подготовке' обязательно!");
       return errors;
     }
@@ -370,6 +424,12 @@ export default {
         });
     },
     sendForm() {
+      if (this.$v.form.$model.main_diploma_scan) {
+        this.uploadMainDiplomaScan = false;
+      }
+      if (this.$v.form.$model.gesture_diploma_scan) {
+        this.uploadGestureDiplomaScan = false;
+      }
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({
@@ -400,6 +460,10 @@ export default {
               data.user.organization = setSecondProfilePart.user.organization;
               data.user.jobPosition = setSecondProfilePart.user.jobPosition;
               data.user.education = setSecondProfilePart.user.education;
+              data.user.mainDiplomaScan =
+                setSecondProfilePart.user.mainDiplomaScan;
+              data.user.gestureDiplomaScan =
+                setSecondProfilePart.user.gestureDiplomaScan;
 
               cache.writeQuery({
                 query: GET_SECOND_PROFILE_PART,

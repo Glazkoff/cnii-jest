@@ -94,7 +94,40 @@
         class="mb-2"
         required
       ></v-textarea>
+      <div class="mb-4" v-if="user.characteristic && !uploadCharacteristic">
+        <small>Характеристика</small><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadCharacteristic = true;
+            user.characteristic = null;
+            $v.form.characteristic.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${user.characteristic}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
       <v-file-input
+        v-else
         chips
         accept="image/png, image/jpeg, image/bmp"
         :messages="[
@@ -109,7 +142,33 @@
         @input="sendForm()"
         @blur="sendForm()"
       ></v-file-input>
+      <div
+        class="mb-4"
+        v-if="user.employmentHistory && !uploadEmploymentHistory"
+      >
+        <small>Заверенная копия трудовой книжки (все страницы)</small><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadEmploymentHistory = true;
+            user.employmentHistory = null;
+            $v.form.employment_history.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <embed
+          :src="`/media/${user.employmentHistory}`"
+          aspect-ratio="1"
+          height="200px"
+          width="100%"
+        />
+      </div>
       <v-file-input
+        v-else
         chips
         accept="application/pdf"
         placeholder="Прикрепите скан"
@@ -118,6 +177,8 @@
         :error-messages="employmentHistoryErrors"
         v-model="$v.form.employment_history.$model"
         :messages="['Загрузите в формате pdf']"
+        @input="sendForm()"
+        @blur="sendForm()"
       ></v-file-input>
     </v-form>
     <v-btn
@@ -149,7 +210,7 @@
 // - training Повышение квалификации
 // - organization_membership Членство в организациях
 
-import { required } from "vuelidate/lib/validators";
+import { required, requiredIf } from "vuelidate/lib/validators";
 import {
   SET_FIFTH_PROFILE_PART,
   UPDATE_REQUEST_STATUS
@@ -163,6 +224,8 @@ export default {
       formLoading: false,
       circleLoading: false,
       circleLoading2: false,
+      uploadCharacteristic: false,
+      uploadEmploymentHistory: false,
       form: {
         full_work_experience_start_year: null,
         current_job_experience_start_year: null,
@@ -188,7 +251,6 @@ export default {
     user: function (val) {
       if (val) {
         if (val.fullWorkExperienceStartYear) {
-          console.log(val.fullWorkExperienceStartYear.split("A_"));
           this.$v.form.$model.full_work_experience_start_year =
             val.fullWorkExperienceStartYear.split("A_")[1];
         }
@@ -206,40 +268,6 @@ export default {
           this.$v.form.$model.organization_membership =
             val.organizationMembership;
         }
-        if (val.characteristic) {
-          this.circleLoading = true;
-          this.$http({
-            url: "/media/" + val.characteristic,
-            method: "GET",
-            responseType: "blob"
-          }).then(response => {
-            this.$v.form.$model.characteristic = new File(
-              [response.data],
-              val.characteristic.split("/")[
-                val.characteristic.split("/").length - 1
-              ]
-            );
-            this.circleLoading = false;
-            this.$v.form.characteristic.$touch();
-          });
-        }
-        if (val.employmentHistory) {
-          this.circleLoading2 = true;
-          this.$http({
-            url: "/media/" + val.employmentHistory,
-            method: "GET",
-            responseType: "blob"
-          }).then(response => {
-            this.$v.form.$model.employment_history = new File(
-              [response.data],
-              val.employmentHistory.split("/")[
-                val.employmentHistory.split("/").length - 1
-              ]
-            );
-            this.circleLoading2 = false;
-            this.$v.form.employment_history.$touch();
-          });
-        }
       }
     }
   },
@@ -250,8 +278,16 @@ export default {
       awards: { required },
       training: { required },
       organization_membership: { required },
-      characteristic: { required },
-      employment_history: { required }
+      characteristic: {
+        required: requiredIf(function () {
+          return !this.user.characteristic || this.uploadCharacteristic;
+        })
+      },
+      employment_history: {
+        required: requiredIf(function () {
+          return !this.user.employmentHistory || this.uploadEmploymentHistory;
+        })
+      }
     }
   },
   computed: {
@@ -294,6 +330,7 @@ export default {
       const errors = [];
       if (!this.$v.form.characteristic.$dirty) return errors;
       !this.$v.form.characteristic.required &&
+        !(this.user.characteristic || !this.uploadCharacteristic) &&
         errors.push("Поле 'Характеристика' обязательно!");
       return errors;
     },
@@ -301,6 +338,7 @@ export default {
       const errors = [];
       if (!this.$v.form.employment_history.$dirty) return errors;
       !this.$v.form.employment_history.required &&
+        !(this.user.employmentHistory || !this.uploadEmploymentHistory) &&
         errors.push("Поле 'Копия трудовой книжки' обязательно!");
       return errors;
     }
@@ -354,6 +392,12 @@ export default {
         });
     },
     sendForm() {
+      if (this.$v.form.$model.characteristic) {
+        this.uploadCharacteristic = false;
+      }
+      if (this.$v.form.$model.employment_history) {
+        this.uploadEmploymentHistory = false;
+      }
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({
@@ -378,7 +422,7 @@ export default {
                   userId: this.$store.getters.user_id
                 }
               });
-
+              console.log("setFifthProfilePart", setFifthProfilePart);
               data.user.fullWorkExperienceStartYear =
                 setFifthProfilePart.user.fullWorkExperienceStartYear;
               data.user.currentJobExperienceStartYear =
@@ -387,6 +431,10 @@ export default {
               data.user.training = setFifthProfilePart.user.training;
               data.user.organizationMembership =
                 setFifthProfilePart.user.organizationMembership;
+              data.user.characteristic =
+                setFifthProfilePart.user.characteristic;
+              data.user.employmentHistory =
+                setFifthProfilePart.user.employmentHistory;
 
               cache.writeQuery({
                 query: GET_FIFTH_PROFILE_PART,
