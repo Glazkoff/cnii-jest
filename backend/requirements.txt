@@ -13,3 +13,4 @@ lxml
 # django-template-engines
 # Pillow
 # django-template-engines
+markdown2>=2.4.1 # not directly required, pinned by Snyk to avoid a vulnerability
