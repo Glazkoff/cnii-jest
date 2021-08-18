@@ -1,7 +1,9 @@
 <template>
   <v-app id="app">
     <AppBar @change-drawer="changeDrawer"></AppBar>
-    <v-navigation-drawer v-model="drawer" fixed temporary></v-navigation-drawer>
+    <v-navigation-drawer v-model="drawer" fixed temporary>
+      <AppNavDrawer></AppNavDrawer>
+    </v-navigation-drawer>
     <v-main>
       <v-container fill-height v-if="isAppLoading">
         <v-layout align-center="align-center" justify-center="justify-center">
@@ -20,11 +22,13 @@
 
 <script>
 import AppBar from "@/components/global/AppBar.vue";
+import AppNavDrawer from "@/components/global/AppNavDrawer.vue";
 
 export default {
   name: "Main",
   components: {
-    AppBar
+    AppBar,
+    AppNavDrawer
   },
   data() {
     return {

@@ -3,13 +3,35 @@
     <v-container class="py-0 fill-height">
       <v-app-bar-nav-icon
         @click="changeDrawer"
-        class="mr-2"
+        class="mr-2 d-flex d-sm-none"
       ></v-app-bar-nav-icon>
-      <v-toolbar-title>ЦНИИ Русского жестового языка </v-toolbar-title>
+      <v-avatar size="40" class="mr-2">
+        <img
+          src="../../assets/logo.svg"
+          alt="Лого ЦНИИ Русского жестового языка"
+        />
+      </v-avatar>
+      <v-toolbar-title class="d-none d-sm-none d-md-flex">
+        ЦНИИ Русского жестового языка
+      </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn text to="/" v-if="isAuthenticated"> Список заявок </v-btn>
-      <v-btn to="/login" v-if="!isAuthenticated">Войти</v-btn>
-      <v-btn text v-if="isAuthenticated" @click="logOut">Выйти</v-btn>
+      <v-btn class="d-none d-sm-flex" text to="/" v-if="isAuthenticated">
+        Список заявок
+      </v-btn>
+      <v-btn class="d-none d-sm-flex" to="/login" v-if="!isAuthenticated" text>
+        Войти
+      </v-btn>
+      <v-btn class="d-none d-sm-flex" to="/signup" v-if="!isAuthenticated" text>
+        Зарегистрироваться
+      </v-btn>
+      <v-btn
+        class="d-none d-sm-flex"
+        text
+        v-if="isAuthenticated"
+        @click="logOut"
+      >
+        Выйти
+      </v-btn>
     </v-container>
   </v-app-bar>
 </template>

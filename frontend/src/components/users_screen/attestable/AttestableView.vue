@@ -80,7 +80,10 @@ import ProfileStep3 from "./ProfileStep3";
 import ProfileStep4 from "./ProfileStep4";
 import ProfileStep5 from "./ProfileStep5";
 import ProfileStep6 from "./ProfileStep6";
-import { REQUEST_STATUS } from "@/graphql/user_request_queries.js";
+import {
+  REQUEST_STATUS,
+  USER_REQUESTS
+} from "@/graphql/user_request_queries.js";
 import { FINISH_REQUEST } from "@/graphql/user_request_mutations.js";
 export default {
   name: "AttestableView",
@@ -142,8 +145,31 @@ export default {
       this.$apollo
         .mutate({
           mutation: FINISH_REQUEST,
-          variables: { requestId: this.$route.params.id }
+          variables: { requestId: this.$route.params.id },
+          update: (cache, { data: { finishRequest } }) => {
+            let data = cache.readQuery({
+              query: USER_REQUESTS,
+              variables: {
+                userId: this.$store.getters.user_id
+              }
+            });
+            let findIndex = data.userRequests.findIndex(el => {
+              el.id == finishRequest.request.id;
+            });
+            if (findIndex != -1) {
+              data.userRequests[findIndex].status =
+                finishRequest.request.status;
+            }
+            cache.writeQuery({
+              query: USER_REQUESTS,
+              variables: {
+                userId: this.$store.getters.user_id
+              },
+              data
+            });
+          }
         })
+
         .then(() => {
           this.$store.commit("OPEN_SUCCESS_DIALOG");
           this.$router.push("/");

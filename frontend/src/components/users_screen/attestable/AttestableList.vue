@@ -1,9 +1,12 @@
 <template>
   <div>
     <SendingConfirmationDialog
-      @close.prevent="$store.commit('CLOSE_SUCCESS_DIALOG')"
+      @close="$store.commit('CLOSE_SUCCESS_DIALOG')"
     ></SendingConfirmationDialog>
     <h1>Ваши заявки</h1>
+    <v-btn color="primary" class="mt-2 mb-2" block outlined>
+      Подать новую заявку
+    </v-btn>
     <v-data-table :headers="headers" :items="items">
       <template v-slot:item="row">
         <tr>
@@ -71,11 +74,9 @@ export default {
   },
   computed: {
     items() {
-      console.log(this.userRequests);
       if (this.userRequests !== undefined) {
-        let reqArr = [...this.userRequests];
+        let reqArr = JSON.parse(JSON.stringify(this.userRequests));
         return reqArr.map(el => {
-          console.log(el.status.toUpperCase());
           switch (el.status.toUpperCase()) {
             case "STEP_1":
               el.status = "Шаг 1";

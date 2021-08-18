@@ -111,7 +111,10 @@ import {
   SET_SIXTH_PROFILE_PART,
   UPDATE_REQUEST_STATUS
 } from "@/graphql/user_request_mutations.js";
-import { GET_SIXTH_PROFILE_PART } from "@/graphql/user_request_queries.js";
+import {
+  GET_SIXTH_PROFILE_PART,
+  USER_REQUESTS
+} from "@/graphql/user_request_queries.js";
 import DatePicker from "../../global/DatePicker.vue";
 
 export default {
@@ -215,6 +218,28 @@ export default {
             variables: {
               requestId: this.$route.params.id,
               statusNumber: stepNumber
+            },
+            update: (cache, { data: { updateRequestStatus } }) => {
+              let data = cache.readQuery({
+                query: USER_REQUESTS,
+                variables: {
+                  userId: this.$store.getters.user_id
+                }
+              });
+              let findIndex = data.userRequests.findIndex(el => {
+                el.id == updateRequestStatus.request.id;
+              });
+              if (findIndex != -1) {
+                data.userRequests[findIndex].status =
+                  updateRequestStatus.request.status;
+              }
+              cache.writeQuery({
+                query: USER_REQUESTS,
+                variables: {
+                  userId: this.$store.getters.user_id
+                },
+                data
+              });
             }
           })
           .then(() => {
