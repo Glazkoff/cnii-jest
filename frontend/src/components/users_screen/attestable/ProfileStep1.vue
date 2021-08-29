@@ -220,7 +220,11 @@ export default {
       sex: { required },
       photo: {
         required: requiredIf(function () {
-          return !this.user.photo || this.uploadPhoto;
+          if (this.user != undefined) {
+            return !this.user.photo || this.uploadPhoto;
+          } else {
+            return true;
+          }
         })
       }
     }
@@ -247,7 +251,8 @@ export default {
     sexErrors() {
       const errors = [];
       if (!this.$v.form.sex.$dirty) return errors;
-      !this.$v.form.sex.required && errors.push("Поле 'Пол' обязательно");
+      (!this.$v.form.sex.required || this.$v.form.sex.$model == "N") &&
+        errors.push("Поле 'Пол' обязательно");
       return errors;
     },
     dateErrors() {
@@ -260,9 +265,13 @@ export default {
     photoErrors() {
       const errors = [];
       if (!this.$v.form.photo.$dirty) return errors;
-      !this.$v.form.photo.required &&
-        !(this.user.photo || !this.uploadPhoto) &&
-        errors.push("Поле 'Фото' обязательно");
+      if (this.user != undefined) {
+        !this.$v.form.photo.required &&
+          (this.$v.form.photo.$model == null ||
+            this.$v.form.photo.$model == "" ||
+            !this.uploadPhoto) &&
+          errors.push("Поле 'Фото' обязательно");
+      }
       return errors;
     },
     predefinedBirthday() {

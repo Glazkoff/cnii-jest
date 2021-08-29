@@ -16,7 +16,7 @@ def current_year():
 
 class CustomUser(models.Model):
     """Пользователь"""
-    SEX_CHOICES = (("M", "Мужской"), ("F", "Женский"))
+    SEX_CHOICES = (("N", "Не указан"), ("M", "Мужской"), ("F", "Женский"))
     user = models.OneToOneField(
         User, verbose_name="Пользователь", on_delete=models.CASCADE)
     surname = models.CharField("Фамилия", max_length=150, blank=True)
@@ -24,7 +24,7 @@ class CustomUser(models.Model):
     patricity = models.CharField("Отчество", max_length=150, blank=True)
     birthday = models.DateField("Дата рождения", blank=True, null=True)
     sex = models.CharField(verbose_name="Пол", max_length=1,
-                           choices=SEX_CHOICES, blank=True)
+                           choices=SEX_CHOICES, default="N", blank=False)
     photo = models.ImageField(verbose_name="Загрузка фото",
                               upload_to='photo', blank=True)
     native_language = models.CharField(
@@ -90,13 +90,16 @@ class CustomUser(models.Model):
 class Request(models.Model):
     """Заявка"""
     STATUS_CHOICES = (("step_1", "Шаг 1"), ("step_2", "Шаг 2"),
-                      ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"), ("step_6", "Шаг 6"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
+                      ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"), ("step_6", "Шаг 6"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("returned", "Возвращена на доработку"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
     request_number = models.CharField(
         verbose_name="Номер заявки", max_length=10)
     user = models.ForeignKey(
-        User, verbose_name="Пользователь", on_delete=models.CASCADE)
+        CustomUser, verbose_name="Пользователь",
+        related_name='custom_user', on_delete=models.CASCADE)
     status = models.CharField(verbose_name="Статус заявки", max_length=9,
-                              choices=STATUS_CHOICES)
+                              choices=STATUS_CHOICES, default="step_1")
+    is_paid = models.BooleanField(verbose_name="Оплачена ли", default=False)
+    comment = models.TextField(verbose_name="Комментарий", blank=True)
     created_at = models.DateTimeField(
         verbose_name="Когда создана", auto_now_add=True)
     updated_at = models.DateTimeField(

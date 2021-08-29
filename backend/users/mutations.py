@@ -337,3 +337,36 @@ class FinishRequestMutation(graphene.Mutation):
             return UpdateRequestStatusMutation(request=request)
         except:
             return UpdateRequestStatusMutation(request=None)
+
+
+class StartNewRequestMutation(graphene.Mutation):
+    class Arguments:
+        user_id = graphene.ID()
+
+    request = graphene.Field(RequestType)
+
+    @classmethod
+    def mutate(cls, root, info, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+            custom_user = CustomUser.objects.get_or_create(user=user)
+            request = Request.objects.create(user=custom_user[0])
+            return StartNewRequestMutation(request=request)
+        except:
+            return StartNewRequestMutation(request=None)
+
+
+class DeleteRequestMutation(graphene.Mutation):
+    class Arguments:
+        request_id = graphene.ID()
+
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, request_id):
+        try:
+            request = Request.objects.get(pk=request_id)
+            request.delete()
+            return DeleteRequestMutation(cls(ok=False))
+        except:
+            return DeleteRequestMutation(cls(ok=True))

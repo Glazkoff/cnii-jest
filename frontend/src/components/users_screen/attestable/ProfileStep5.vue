@@ -28,7 +28,7 @@
         :items="selectYears()"
         item-text="text"
         item-value="value"
-        label="Стаж настоящей должности"
+        label="Год начала работы по настоящей должности"
         v-model="$v.form.current_job_experience_start_year.$model"
         :error-messages="currentJobExperienceStartYearErrors"
         @input="
@@ -278,9 +278,9 @@ export default {
     form: {
       full_work_experience_start_year: { required },
       current_job_experience_start_year: { required },
-      awards: { required },
-      training: { required },
-      organization_membership: { required },
+      awards: {},
+      training: {},
+      organization_membership: {},
       characteristic: {
         required: requiredIf(function () {
           return !this.user.characteristic || this.uploadCharacteristic;
@@ -311,29 +311,25 @@ export default {
     awardsErrors() {
       const errors = [];
       if (!this.$v.form.awards.$dirty) return errors;
-      !this.$v.form.awards.required &&
-        errors.push("Поле 'Наличие наград' обязательно!");
       return errors;
     },
     trainingErrors() {
       const errors = [];
       if (!this.$v.form.training.$dirty) return errors;
-      !this.$v.form.training.required &&
-        errors.push("Поле 'Повышение квалификации' обязательно!");
       return errors;
     },
     organizationMembershipErrors() {
       const errors = [];
       if (!this.$v.form.organization_membership.$dirty) return errors;
-      !this.$v.form.organization_membership.required &&
-        errors.push("Поле 'Членство в организациях' обязательно!");
       return errors;
     },
     characteristicErrors() {
       const errors = [];
       if (!this.$v.form.characteristic.$dirty) return errors;
       !this.$v.form.characteristic.required &&
-        !(this.user.characteristic || !this.uploadCharacteristic) &&
+        (this.form.characteristic == null ||
+          this.form.characteristic == "" ||
+          !this.uploadCharacteristic) &&
         errors.push("Поле 'Характеристика' обязательно!");
       return errors;
     },
@@ -341,7 +337,9 @@ export default {
       const errors = [];
       if (!this.$v.form.employment_history.$dirty) return errors;
       !this.$v.form.employment_history.required &&
-        !(this.user.employmentHistory || !this.uploadEmploymentHistory) &&
+        (this.form.employmentHistory == null ||
+          this.form.employmentHistory == "" ||
+          !this.uploadEmploymentHistory) &&
         errors.push("Поле 'Копия трудовой книжки' обязательно!");
       return errors;
     }

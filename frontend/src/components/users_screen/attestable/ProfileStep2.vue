@@ -365,7 +365,9 @@ export default {
       const errors = [];
       if (!this.$v.form.main_diploma_scan.$dirty) return errors;
       !this.$v.form.main_diploma_scan.required &&
-        !(this.user.mainDiplomaScan || !this.uploadMainDiplomaScan) &&
+        (this.form.mainDiplomaScan == null ||
+          this.form.mainDiplomaScan == "" ||
+          !this.uploadMainDiplomaScan) &&
         errors.push("Поле 'Диплом об образовании' обязательно!");
       return errors;
     },
@@ -373,7 +375,9 @@ export default {
       const errors = [];
       if (!this.$v.form.gesture_diploma_scan.$dirty) return errors;
       !this.$v.form.gesture_diploma_scan.required &&
-        !(this.user.gestureDiplomaScan || !this.uploadGestureDiplomaScan) &&
+        (this.form.gestureDiplomaScan == null ||
+          this.form.gestureDiplomaScan == "" ||
+          !this.uploadGestureDiplomaScan) &&
         errors.push("Поле 'Диплом об подготовке' обязательно!");
       return errors;
     }

@@ -9,6 +9,11 @@ import math
 new_width = 450
 
 
+class RequestInline(admin.TabularInline):
+    model = Request
+    extra = 0
+
+
 class CustomUserAdmin(admin.ModelAdmin):
 
     list_display = ('id', 'surname', 'name', 'patricity',
@@ -37,6 +42,7 @@ class CustomUserAdmin(admin.ModelAdmin):
         ("Шаг 6. Теоретическая часть аттестации", {
             'fields': ('attestation_certificate_number', 'attestation_certificate_date', 'attestation_certificate_scan', 'attestation_certificate_scan_image')}),
     )
+    inlines = (RequestInline,)
 
     def photo_image(self, obj):
         width = obj.photo.width
@@ -131,9 +137,16 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 class RequestsAdmin(admin.ModelAdmin):
-    list_display = ("request_number", "user", "status",
+    list_display = ("request_number", "user", "status", "is_paid",
                     "created_at", "updated_at")
+    # readonly_fields = ("user",)
     list_filter = ('status',)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return self.readonly_fields + ('user',)
+        else:
+            return self.readonly_fields
 
     class Meta:
         model = Request

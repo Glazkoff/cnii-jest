@@ -206,3 +206,25 @@ export const FINISH_REQUEST = gql`
     }
   }
 `;
+
+// Мутация для создания новой заявки
+export const START_NEW_REQUEST = gql`
+  mutation ($userId: ID!) {
+    startNewRequest(userId: $userId) {
+      request {
+        id
+        requestNumber
+        status
+      }
+    }
+  }
+`;
+
+// Мутация для удаления заявки
+export const DELETE_REQUEST = gql`
+  mutation ($requestId: ID!) {
+    deleteRequest(requestId: $requestId) {
+      ok
+    }
+  }
+`;

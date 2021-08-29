@@ -4,10 +4,20 @@
       @close="$store.commit('CLOSE_SUCCESS_DIALOG')"
     ></SendingConfirmationDialog>
     <h1>Ваши заявки</h1>
-    <v-btn color="primary" class="mt-2 mb-2" block outlined>
+    <v-btn
+      color="primary"
+      class="mt-2 mb-2"
+      block
+      outlined
+      @click="startNewRequest"
+    >
       Подать новую заявку
     </v-btn>
-    <v-data-table :headers="headers" :items="items">
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      no-data-text="Заявки отсутствуют"
+    >
       <template v-slot:item="row">
         <tr>
           <td>
@@ -24,6 +34,9 @@
               >
                 Редактировать <v-icon dark>mdi-arrow-right</v-icon>
               </v-btn>
+              <v-btn icon tile depressed @click="deleteRequest(row.item.id)">
+                <v-icon dark> mdi-delete </v-icon>
+              </v-btn>
             </div>
           </td>
         </tr>
@@ -35,6 +48,10 @@
 
 <script>
 import { USER_REQUESTS } from "@/graphql/user_request_queries.js";
+import {
+  START_NEW_REQUEST,
+  DELETE_REQUEST
+} from "@/graphql/user_request_mutations.js";
 import SendingConfirmationDialog from "./SendingConfirmationDialog";
 
 export default {
@@ -108,6 +125,9 @@ export default {
             case "COMPLETED":
               el.status = "Завершена работа";
               break;
+            case "RETURNED":
+              el.status = "Возвращена на доработку";
+              break;
             default:
               el.status = "-";
               break;
@@ -120,6 +140,66 @@ export default {
     },
     showSuccessDialog() {
       return this.$store.state.successRequestDialog;
+    }
+  },
+  methods: {
+    startNewRequest() {
+      this.$apollo
+        .mutate({
+          mutation: START_NEW_REQUEST,
+          variables: { userId: this.$store.getters.user_id },
+          update: (cache, { data: { startNewRequest } }) => {
+            let data = cache.readQuery({
+              query: USER_REQUESTS,
+              variables: {
+                userId: this.$store.getters.user_id
+              }
+            });
+            data.userRequests.push(startNewRequest.request);
+            cache.writeQuery({
+              query: USER_REQUESTS,
+              variables: {
+                userId: this.$store.getters.user_id
+              },
+              data
+            });
+          }
+        })
+        .then(res => {
+          if (res.data.startNewRequest != null) {
+            this.$router.push(
+              `/request/${res.data.startNewRequest.request.id}`
+            );
+            console.log(res.data.startNewRequest.request.id);
+          }
+        });
+    },
+    deleteRequest(requestId) {
+      this.$apollo.mutate({
+        mutation: DELETE_REQUEST,
+        variables: { requestId },
+        update: cache => {
+          let data = cache.readQuery({
+            query: USER_REQUESTS,
+            variables: {
+              userId: this.$store.getters.user_id
+            }
+          });
+          let index = data.userRequests.findIndex(el => {
+            return el.id == requestId;
+          });
+          if (index != -1) {
+            data.userRequests.splice(index, 1);
+          }
+          cache.writeQuery({
+            query: USER_REQUESTS,
+            variables: {
+              userId: this.$store.getters.user_id
+            },
+            data
+          });
+        }
+      });
     }
   }
 };

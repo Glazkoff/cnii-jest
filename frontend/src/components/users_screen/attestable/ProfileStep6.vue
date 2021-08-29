@@ -190,10 +190,9 @@ export default {
       const errors = [];
       if (!this.$v.form.attestation_certificate_scan.$dirty) return errors;
       !this.$v.form.attestation_certificate_scan.required &&
-        !(
-          this.user.attestationCertificateScan ||
-          !this.uploadAttestationCertificateScan
-        ) &&
+        (this.form.attestationCertificateScan == null ||
+          this.form.attestationCertificateScan == "" ||
+          !this.uploadAttestationCertificateScan) &&
         errors.push("Поле 'Скан сертификата аттестации' обязательно!");
       return errors;
     },

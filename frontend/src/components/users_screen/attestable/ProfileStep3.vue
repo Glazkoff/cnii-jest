@@ -230,7 +230,9 @@ export default {
       const errors = [];
       if (!this.$v.form.passport_part1_scan.$dirty) return errors;
       !this.$v.form.passport_part1_scan.required &&
-        !(this.user.passportPart1Scan || !this.uploadPassportPart1Scan) &&
+        (this.form.passportPart1Scan == null ||
+          this.form.passportPart1Scan == "" ||
+          !this.uploadPassportPart1Scan) &&
         errors.push("Поле 'Скан паспорта (часть 1)' обязательно!");
       return errors;
     },
@@ -238,7 +240,9 @@ export default {
       const errors = [];
       if (!this.$v.form.passport_part2_scan.$dirty) return errors;
       !this.$v.form.passport_part2_scan.required &&
-        !(this.user.passportPart2Scan || !this.uploadPassportPart2Scan) &&
+        (this.form.passportPart2Scan == null ||
+          this.form.passportPart2Scan == "" ||
+          !this.uploadPassportPart2Scan) &&
         errors.push("Поле 'Скан паспорта (часть 2)' обязательно!");
       return errors;
     }
