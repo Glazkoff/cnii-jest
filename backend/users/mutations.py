@@ -360,9 +360,10 @@ class FinishRequestMutation(graphene.Mutation):
 
             created_at_formatted = request.created_at.strftime(
                 "%d.%m.%Y %H:%M:%S")
+            register = request_register.__str__()
 
-            mail_topic = f'Заявка на аттестацию {request_register.request_number}'
-            mail_body = f"Создана новая заявка от {created_at_formatted}"
+            mail_topic = f'Заявка на аттестацию {register}'
+            mail_body = f"Создана новая заявка от {created_at_formatted} ({register})"
             mail_from = "notify@nglazkov.ru"
             mail_to = ['zitrnik@gmail.com']
 
