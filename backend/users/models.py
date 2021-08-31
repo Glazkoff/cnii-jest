@@ -91,28 +91,19 @@ class Request(models.Model):
     """Заявка"""
     STATUS_CHOICES = (("step_1", "Шаг 1"), ("step_2", "Шаг 2"),
                       ("step_3", "Шаг 3"), ("step_4", "Шаг 4"), ("step_5", "Шаг 5"), ("step_6", "Шаг 6"), ("on_check", "Отправлена на проверку"), ("canceled", "Отклонена"), ("returned", "Возвращена на доработку"), ("confirmed", "Успешно подтверждена"), ("completed", "Завершена работа"))
-    request_number = models.CharField(
-        verbose_name="Номер заявки", max_length=10)
     user = models.ForeignKey(
         CustomUser, verbose_name="Пользователь",
         related_name='custom_user', on_delete=models.CASCADE)
     status = models.CharField(verbose_name="Статус заявки", max_length=9,
                               choices=STATUS_CHOICES, default="step_1")
     is_paid = models.BooleanField(verbose_name="Оплачена ли", default=False)
+    cheque = models.ImageField(verbose_name="Чек об оплате организационного взноса",
+                               upload_to='cheque', blank=True)
     comment = models.TextField(verbose_name="Комментарий", blank=True)
     created_at = models.DateTimeField(
         verbose_name="Когда создана", auto_now_add=True)
     updated_at = models.DateTimeField(
         verbose_name="Когда обновлена последний раз", auto_now=True)
-
-    def request_number(self):
-        additional_nulls = ""
-        if self.id < 10:
-            additional_nulls += "00"
-        elif self.id < 100:
-            additional_nulls += "0"
-        return "06-10-"+additional_nulls+str(self.id)
-    request_number.short_description = "Номер заявки"
 
     def __str__(self):
         return str(f"Заявка #{self.id}")
@@ -122,3 +113,48 @@ class Request(models.Model):
         managed = True
         verbose_name = 'Заявка на аттестацию'
         verbose_name_plural = 'Заявки на аттестацию'
+
+
+class RequestRegister(models.Model):
+    """Заявка в реестре"""
+    request = models.ForeignKey(
+        Request, verbose_name="Заявка",
+        related_name='request', on_delete=models.CASCADE)
+    order = models.IntegerField("Порядковый номер")
+    request_number = models.CharField(
+        verbose_name="Номер заявки", max_length=11)
+
+    def request_number(self):
+        additional_nulls = ""
+        if self.order < 10:
+            additional_nulls += "00"
+        elif self.order < 100:
+            additional_nulls += "0"
+        return "06-10-"+additional_nulls+str(self.order)
+    request_number.short_description = "Номер заявки"
+
+    def __str__(self):
+        additional_nulls = ""
+        if self.order < 10:
+            additional_nulls += "00"
+        elif self.order < 100:
+            additional_nulls += "0"
+        return "Заявка 06-10-"+additional_nulls+str(self.order)
+
+    class Meta:
+        managed = True
+        verbose_name = 'Заявка в реестре'
+        verbose_name_plural = 'Реестр заявок'
+
+
+class LastRequestOrder(models.Model):
+    """Настроки реестра"""
+    last_order = models.IntegerField("Последний порядковый номер", default=0)
+
+    class Meta:
+        managed = True
+        verbose_name = 'Настроки реестра'
+        verbose_name_plural = 'Настроки реестра'
+
+    def __str__(self):
+        return str(f"Последний порядковый номер: {self.last_order}")

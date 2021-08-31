@@ -24,8 +24,15 @@
             <b>{{ row.item.requestNumber }}</b>
           </td>
           <td>{{ row.item.status }}</td>
+          <td
+            v-if="row.item.comment"
+            style="max-width: 200px; word-wrap: break-word"
+          >
+            {{ row.item.comment }}
+          </td>
+          <td v-else>-</td>
           <td>
-            <div class="d-flex justify-end">
+            <div class="d-flex justify-end" v-if="canBeEdited(row.item.id)">
               <v-btn
                 class="mx-2"
                 dark
@@ -38,6 +45,7 @@
                 <v-icon dark> mdi-delete </v-icon>
               </v-btn>
             </div>
+            <div v-else>-</div>
           </td>
         </tr>
       </template>
@@ -69,6 +77,11 @@ export default {
         {
           text: "Статус заявки",
           value: "status"
+        },
+        {
+          text: "Комментарий",
+          value: "comment",
+          sortable: false
         },
         {
           text: "Действия",
@@ -170,7 +183,6 @@ export default {
             this.$router.push(
               `/request/${res.data.startNewRequest.request.id}`
             );
-            console.log(res.data.startNewRequest.request.id);
           }
         });
     },
@@ -200,6 +212,32 @@ export default {
           });
         }
       });
+    },
+    canBeEdited(requestId) {
+      let request = this.userRequests.find(el => el.id == requestId);
+      let status = "";
+      if (request != null) {
+        status = request.status;
+      }
+      let canBe = false;
+      switch (status.toUpperCase()) {
+        case "STEP_1":
+        case "STEP_2":
+        case "STEP_3":
+        case "STEP_4":
+        case "STEP_5":
+        case "STEP_6":
+        case "RETURNED":
+          canBe = true;
+          break;
+        case "ON_CHECK":
+        case "CANCELED":
+        case "CONFIRMED":
+        case "COMPLETED":
+        default:
+          break;
+      }
+      return canBe;
     }
   }
 };

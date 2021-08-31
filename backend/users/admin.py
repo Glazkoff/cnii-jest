@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from admin_interface.models import Theme
-from .models import CustomUser, Request
+from .models import CustomUser, Request, RequestRegister, LastRequestOrder
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 import math
@@ -137,10 +137,11 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 class RequestsAdmin(admin.ModelAdmin):
-    list_display = ("request_number", "user", "status", "is_paid",
+    list_display = ("id", "request_number", "user", "status", "is_paid",
                     "created_at", "updated_at")
-    # readonly_fields = ("user",)
+    readonly_fields = ("request_number", "cheque_image")
     list_filter = ('status',)
+    list_display_links = ("id", "request_number",)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -148,12 +149,53 @@ class RequestsAdmin(admin.ModelAdmin):
         else:
             return self.readonly_fields
 
+    def cheque_image(self, obj):
+        width = obj.cheque.width
+        height = obj.cheque.height
+        new_height = math.ceil((height*new_width) / width)
+        return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
+            url=obj.cheque.url,
+            width=new_width,
+            height=new_height
+        ))
+    cheque_image.short_description = "Изображение чека"
+
+    def request_number(self, obj=None):
+        try:
+            register = RequestRegister.objects.filter(request=obj)
+            if register[0] is not None:
+                additional_nulls = ""
+                if register[0].order < 10:
+                    additional_nulls += "00"
+                elif register[0].order < 100:
+                    additional_nulls += "0"
+                return "06-10-"+additional_nulls+str(register[0].order)
+        except:
+            return "-"
+    request_number.short_description = "Номер в регистре"
+
     class Meta:
         model = Request
 
 
+class RequestRegisterAdmin(admin.ModelAdmin):
+    class Meta:
+        model = RequestRegister
+
+
+class LastRequestOrderAdmin(admin.ModelAdmin):
+    class Meta:
+        model = LastRequestOrder
+
+    def has_add_permission(self, request, obj=None):
+        return LastRequestOrder.objects.all().count() == 0
+
+
 admin.site.register(Request, RequestsAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(RequestRegister, RequestRegisterAdmin)
+admin.site.register(LastRequestOrder, LastRequestOrderAdmin)
+
 admin.site.unregister(Theme)
 
 admin.site.site_header = "Админпанель системы ЦНИИ Русского жестового языка"

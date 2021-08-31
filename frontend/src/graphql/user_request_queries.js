@@ -75,12 +75,16 @@ export const GET_FIFTH_PROFILE_PART = gql`
 
 // Запрос данных для шестого шага
 export const GET_SIXTH_PROFILE_PART = gql`
-  query ($userId: ID!) {
+  query ($userId: ID!, $requestId: ID!) {
     user(userId: $userId) {
       id
       attestationCertificateNumber
       attestationCertificateDate
       attestationCertificateScan
+    }
+    request(requestId: $requestId) {
+      id
+      cheque
     }
   }
 `;
@@ -92,6 +96,7 @@ export const USER_REQUESTS = gql`
       id
       requestNumber
       status
+      comment
     }
   }
 `;
@@ -102,6 +107,16 @@ export const REQUEST_STATUS = gql`
     request(requestId: $requestId) {
       id
       status
+    }
+  }
+`;
+
+// Запрос данных о чекк заявки
+export const REQUEST_CHEQUE = gql`
+  query ($requestId: ID!) {
+    request(requestId: $requestId) {
+      id
+      cheque
     }
   }
 `;

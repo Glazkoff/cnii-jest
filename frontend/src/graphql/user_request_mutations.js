@@ -163,21 +163,30 @@ export const SET_FIFTH_PROFILE_PART = gql`
 export const SET_SIXTH_PROFILE_PART = gql`
   mutation (
     $userId: ID!
+    $requestId: ID!
     $attestationCertificateNumber: String
     $attestationCertificateDate: Date
     $attestationCertificateScan: Upload
+    $cheque: Upload
   ) {
     setSixthProfilePart(
       userId: $userId
+      requestId: $requestId
       attestationCertificateNumber: $attestationCertificateNumber
       attestationCertificateDate: $attestationCertificateDate
       attestationCertificateScan: $attestationCertificateScan
+      cheque: $cheque
     ) {
       user {
         id
         attestationCertificateNumber
         attestationCertificateDate
         attestationCertificateScan
+      }
+      request {
+        id
+        status
+        cheque
       }
     }
   }
@@ -202,6 +211,10 @@ export const FINISH_REQUEST = gql`
       request {
         id
         status
+      }
+      register {
+        id
+        requestNumber
       }
     }
   }

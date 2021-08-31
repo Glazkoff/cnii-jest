@@ -153,12 +153,15 @@ export default {
                 userId: this.$store.getters.user_id
               }
             });
+
             let findIndex = data.userRequests.findIndex(el => {
-              el.id == finishRequest.request.id;
+              return +el.id == +finishRequest.request.id;
             });
             if (findIndex != -1) {
               data.userRequests[findIndex].status =
                 finishRequest.request.status;
+              data.userRequests[findIndex].requestNumber =
+                finishRequest.register.requestNumber;
             }
             cache.writeQuery({
               query: USER_REQUESTS,

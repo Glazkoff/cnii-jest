@@ -83,6 +83,53 @@
         @input="sendForm()"
         @blur="sendForm()"
       ></v-file-input>
+      <div
+        class="mb-4"
+        v-if="(request != undefined ? request.cheque : false) && !uploadCheque"
+      >
+        <small>Чек об оплате организационного взноса</small><br />
+        <v-btn
+          color="success"
+          text
+          block
+          small
+          @click="
+            uploadCheque = true;
+            request.cheque = null;
+            $v.form.cheque.$model = null;
+          "
+        >
+          Выбрать другой файл
+        </v-btn>
+        <v-img
+          :src="`/media/${request.cheque}`"
+          aspect-ratio="1"
+          max-height="200"
+          contain
+          class="grey lighten-2"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+      </div>
+      <v-file-input
+        v-else
+        chips
+        accept="image/png, image/jpeg, image/bmp"
+        placeholder="Прикрепите скан"
+        label="Чек об оплате орг. взноса"
+        prepend-icon="mdi-camera"
+        :error-messages="chequeErrors"
+        v-model="$v.form.cheque.$model"
+        @input="sendForm()"
+        @blur="sendForm()"
+      ></v-file-input>
     </v-form>
     <v-btn
       class="mt-2"
@@ -113,7 +160,8 @@ import {
 } from "@/graphql/user_request_mutations.js";
 import {
   GET_SIXTH_PROFILE_PART,
-  USER_REQUESTS
+  USER_REQUESTS,
+  REQUEST_CHEQUE
 } from "@/graphql/user_request_queries.js";
 import DatePicker from "../../global/DatePicker.vue";
 
@@ -128,10 +176,12 @@ export default {
       circleLoading1: false,
       circleLoading2: false,
       uploadAttestationCertificateScan: false,
+      uploadCheque: false,
       form: {
         attestation_certificate_number: null,
         attestation_certificate_date: null,
-        attestation_certificate_scan: null
+        attestation_certificate_scan: null,
+        cheque: null
       }
     };
   },
@@ -140,7 +190,16 @@ export default {
       query: GET_SIXTH_PROFILE_PART,
       variables() {
         return {
-          userId: this.$store.getters.user_id
+          userId: this.$store.getters.user_id,
+          requestId: this.$route.params.id
+        };
+      }
+    },
+    request: {
+      query: REQUEST_CHEQUE,
+      variables() {
+        return {
+          requestId: this.$route.params.id
         };
       }
     }
@@ -168,6 +227,11 @@ export default {
             this.uploadAttestationCertificateScan
           );
         })
+      },
+      cheque: {
+        required: requiredIf(function () {
+          return !this.request.cheque || this.uploadCheque;
+        })
       }
     }
   },
@@ -194,6 +258,16 @@ export default {
           this.form.attestationCertificateScan == "" ||
           !this.uploadAttestationCertificateScan) &&
         errors.push("Поле 'Скан сертификата аттестации' обязательно!");
+      return errors;
+    },
+    chequeErrors() {
+      const errors = [];
+      if (!this.$v.form.cheque.$dirty) return errors;
+      !this.$v.form.cheque.required &&
+        (this.form.cheque == null ||
+          this.form.cheque == "" ||
+          !this.uploadCheque) &&
+        errors.push("Поле 'Чек об оплате орг. взноса' обязательно!");
       return errors;
     },
     predefinedAttestationСertificateDate() {
@@ -280,24 +354,30 @@ export default {
       if (this.$v.form.$model.attestation_certificate_scan) {
         this.uploadAttestationCertificateScan = false;
       }
+      if (this.$v.form.$model.cheque) {
+        this.uploadCheque = false;
+      }
       return new Promise((resolve, reject) => {
         this.$apollo
           .mutate({
             mutation: SET_SIXTH_PROFILE_PART,
             variables: {
               userId: this.$store.getters.decoded.user_id,
+              requestId: this.$route.params.id,
               attestationCertificateNumber:
                 this.$v.form.$model.attestation_certificate_number,
               attestationCertificateDate:
                 this.$v.form.$model.attestation_certificate_date,
               attestationCertificateScan:
-                this.$v.form.$model.attestation_certificate_scan
+                this.$v.form.$model.attestation_certificate_scan,
+              cheque: this.$v.form.$model.cheque
             },
             update: (cache, { data: { setSixthProfilePart } }) => {
               const data = cache.readQuery({
                 query: GET_SIXTH_PROFILE_PART,
                 variables: {
-                  userId: this.$store.getters.user_id
+                  userId: this.$store.getters.user_id,
+                  requestId: this.$route.params.id
                 }
               });
 
@@ -307,11 +387,13 @@ export default {
                 setSixthProfilePart.user.attestationCertificateDate;
               data.user.attestationCertificateScan =
                 setSixthProfilePart.user.attestationCertificateScan;
+              data.request.cheque = setSixthProfilePart.request.cheque;
 
               cache.writeQuery({
                 query: GET_SIXTH_PROFILE_PART,
                 variables: {
-                  userId: this.$store.getters.user_id
+                  userId: this.$store.getters.user_id,
+                  requestId: this.$route.params.id
                 },
                 data
               });

@@ -4,9 +4,10 @@ import os
 import datetime
 import graphene
 from django.contrib.auth.models import User
-from .models import CustomUser, Request
-from .types import CustomUserType, RequestType
+from .models import CustomUser, Request, RequestRegister, LastRequestOrder
+from .types import CustomUserType, RequestType, RequestRegisterType
 from graphene_file_upload.scalars import Upload
+from django.core.mail import send_mail
 
 
 class SetFirstProfilePartMutation(graphene.Mutation):
@@ -258,18 +259,28 @@ class SetFifthProfilePartMutation(graphene.Mutation):
 class SetSixthProfilePartMutation(graphene.Mutation):
     class Arguments:
         user_id = graphene.ID(required=True)
+        request_id = graphene.ID(required=True)
         attestation_certificate_number = graphene.String()
         attestation_certificate_date = graphene.Date()
         attestation_certificate_scan = Upload()
+        cheque = Upload()
 
     user = graphene.Field(CustomUserType)
+    request = graphene.Field(RequestType)
 
     @classmethod
-    def mutate(cls, root, info, user_id, attestation_certificate_number=None, attestation_certificate_date=None, attestation_certificate_scan=None):
+    def mutate(cls, root, info, user_id, request_id, attestation_certificate_number=None, attestation_certificate_date=None, attestation_certificate_scan=None, cheque=None):
         try:
             now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
             user = User.objects.get(pk=user_id)
             custom_user = CustomUser.objects.get_or_create(user=user)
+            request = Request.objects.get(pk=request_id)
+            surname = translit(
+                custom_user[0].surname, language_code='ru', reversed=True)
+            name = translit(
+                custom_user[0].name, language_code='ru', reversed=True)
+            patricity = translit(
+                custom_user[0].patricity, language_code='ru', reversed=True)
             if attestation_certificate_number is not None:
                 custom_user[0].attestation_certificate_number = attestation_certificate_number
             if attestation_certificate_date is not None:
@@ -277,19 +288,20 @@ class SetSixthProfilePartMutation(graphene.Mutation):
             if attestation_certificate_scan is not None:
                 filename, extension = os.path.splitext(
                     attestation_certificate_scan.name)
-                surname = translit(
-                    custom_user[0].surname, language_code='ru', reversed=True)
-                name = translit(
-                    custom_user[0].name, language_code='ru', reversed=True)
-                patricity = translit(
-                    custom_user[0].patricity, language_code='ru', reversed=True)
                 new_filename = f"{surname}_{name}_{patricity}_attestation_certificate_{now}{extension}"
                 custom_user[0].attestation_certificate_scan.save(
                     new_filename, File(attestation_certificate_scan))
+            if cheque is not None:
+                filename, extension = os.path.splitext(
+                    cheque.name)
+                new_filename = f"{surname}_{name}_{patricity}_cheque_{now}{extension}"
+                request.cheque.save(
+                    new_filename, File(cheque))
+                request.save()
             custom_user[0].save()
-            return SetSixthProfilePartMutation(user=custom_user[0])
+            return SetSixthProfilePartMutation(user=custom_user[0], request=request)
         except (User.DoesNotExist,):
-            return SetSixthProfilePartMutation(user=None)
+            return SetSixthProfilePartMutation(user=None, request=None)
 
 
 class UpdateRequestStatusMutation(graphene.Mutation):
@@ -326,17 +338,39 @@ class FinishRequestMutation(graphene.Mutation):
         request_id = graphene.ID()
 
     request = graphene.Field(RequestType)
+    register = graphene.Field(RequestRegisterType)
 
     @classmethod
     def mutate(cls, root, info, request_id):
         try:
             request = Request.objects.get(pk=request_id)
-            # TODO: add creating of table with codes
             request.status = "on_check"
             request.save()
-            return UpdateRequestStatusMutation(request=request)
+            last_request_order = LastRequestOrder.objects.get_or_create(pk=1)[
+                0]
+            last_request_order.last_order = last_request_order.last_order+1
+            last_request_order.save()
+            request_register_count = RequestRegister.objects.filter(
+                request=request).count()
+            if request_register_count == 0:
+                request_register = RequestRegister.objects.create(
+                    request=request, order=last_request_order.last_order)
+            else:
+                request_register = RequestRegister.objects.get(request=request)
+
+            created_at_formatted = request.created_at.strftime(
+                "%d.%m.%Y %H:%M:%S")
+
+            mail_topic = f'Заявка на аттестацию {request_register.request_number}'
+            mail_body = f"Создана новая заявка от {created_at_formatted}"
+            mail_from = "notify@nglazkov.ru"
+            mail_to = ['zitrnik@gmail.com']
+
+            send_mail(mail_topic, mail_body,
+                      mail_from, mail_to, fail_silently=False)
+            return FinishRequestMutation(request=request, register=request_register)
         except:
-            return UpdateRequestStatusMutation(request=None)
+            return FinishRequestMutation(request=None, register=None)
 
 
 class StartNewRequestMutation(graphene.Mutation):

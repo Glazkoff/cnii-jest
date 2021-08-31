@@ -1,0 +1,9 @@
+[
+  {
+    "model": "users.lastrequestorder",
+    "pk": 1,
+    "fields": {
+      "last_order": 0
+    }
+  }
+]
