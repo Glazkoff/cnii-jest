@@ -1,5 +1,8 @@
 <template>
   <v-flex class="auth-form text-center">
+    <SuccessSignUpDialog
+      @close="$store.commit('CLOSE_SIGN_UP_DIALOG')"
+    ></SuccessSignUpDialog>
     <h1 class="mb-12">Авторизация</h1>
     <v-card flat light="light">
       <v-card-text>
@@ -71,9 +74,13 @@
 
 <script>
 import { required, email } from "vuelidate/lib/validators";
+import SuccessSignUpDialog from "./SuccessSignUpDialog.vue";
 
 export default {
   name: "LogIn",
+  components: {
+    SuccessSignUpDialog
+  },
   data() {
     return {
       passShow: false,

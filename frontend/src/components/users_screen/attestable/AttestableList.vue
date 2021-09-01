@@ -106,47 +106,51 @@ export default {
     items() {
       if (this.userRequests !== undefined) {
         let reqArr = JSON.parse(JSON.stringify(this.userRequests));
-        return reqArr.map(el => {
-          switch (el.status.toUpperCase()) {
-            case "STEP_1":
-              el.status = "Шаг 1";
-              break;
-            case "STEP_2":
-              el.status = "Шаг 2";
-              break;
-            case "STEP_3":
-              el.status = "Шаг 3";
-              break;
-            case "STEP_4":
-              el.status = "Шаг 4";
-              break;
-            case "STEP_5":
-              el.status = "Шаг 5";
-              break;
-            case "STEP_6":
-              el.status = "Шаг 6";
-              break;
-            case "ON_CHECK":
-              el.status = "Отправлена на проверку";
-              break;
-            case "CANCELED":
-              el.status = "Отклонена";
-              break;
-            case "CONFIRMED":
-              el.status = "Успешно подтверждена";
-              break;
-            case "COMPLETED":
-              el.status = "Завершена работа";
-              break;
-            case "RETURNED":
-              el.status = "Возвращена на доработку";
-              break;
-            default:
-              el.status = "-";
-              break;
-          }
-          return el;
-        });
+        if (Array.isArray(reqArr)) {
+          return reqArr.map(el => {
+            switch (el.status.toUpperCase()) {
+              case "STEP_1":
+                el.status = "Шаг 1";
+                break;
+              case "STEP_2":
+                el.status = "Шаг 2";
+                break;
+              case "STEP_3":
+                el.status = "Шаг 3";
+                break;
+              case "STEP_4":
+                el.status = "Шаг 4";
+                break;
+              case "STEP_5":
+                el.status = "Шаг 5";
+                break;
+              case "STEP_6":
+                el.status = "Шаг 6";
+                break;
+              case "ON_CHECK":
+                el.status = "Отправлена на проверку";
+                break;
+              case "CANCELED":
+                el.status = "Отклонена";
+                break;
+              case "CONFIRMED":
+                el.status = "Успешно подтверждена";
+                break;
+              case "COMPLETED":
+                el.status = "Завершена работа";
+                break;
+              case "RETURNED":
+                el.status = "Возвращена на доработку";
+                break;
+              default:
+                el.status = "-";
+                break;
+            }
+            return el;
+          });
+        } else {
+          return [];
+        }
       } else {
         return this.userRequests;
       }
@@ -168,7 +172,9 @@ export default {
                 userId: this.$store.getters.user_id
               }
             });
-            data.userRequests.push(startNewRequest.request);
+            if (Array.isArray(data.userRequests)) {
+              data.userRequests.push(startNewRequest.request);
+            }
             cache.writeQuery({
               query: USER_REQUESTS,
               variables: {

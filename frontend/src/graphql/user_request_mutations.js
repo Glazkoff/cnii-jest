@@ -228,6 +228,7 @@ export const START_NEW_REQUEST = gql`
         id
         requestNumber
         status
+        comment
       }
     }
   }

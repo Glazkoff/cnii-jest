@@ -194,7 +194,8 @@ export default {
       this.$store.dispatch("SIGN_UP", sendObj).then(
         () => {
           this.formLoading = false;
-          this.$router.push("/");
+          this.$store.commit("OPEN_SIGN_UP_DIALOG");
+          this.$router.push("/login");
         },
         errors => {
           console.log("errors: ", errors);

@@ -12,6 +12,7 @@ export default new Vuex.Store({
     first_path: null,
     loading: false,
     successRequestDialog: false,
+    successSignUpDialog: false,
     errorRequestDialog: false
   },
   getters: {
@@ -60,11 +61,17 @@ export default new Vuex.Store({
     CLOSE_ERROR_DIALOG(state) {
       state.errorRequestDialog = false;
     },
+    CLOSE_SIGN_UP_DIALOG(state) {
+      state.successSignUpDialog = false;
+    },
     OPEN_SUCCESS_DIALOG(state) {
       state.successRequestDialog = true;
     },
     OPEN_ERROR_DIALOG(state) {
       state.errorRequestDialog = true;
+    },
+    OPEN_SIGN_UP_DIALOG(state) {
+      state.successSignUpDialog = true;
     }
   },
   actions: {

@@ -10,6 +10,8 @@ new_width = 450
 
 
 class RequestInline(admin.TabularInline):
+    list_display = ['request_number', "request_number", "status", "is_paid",
+                    "created_at", "updated_at"]
     model = Request
     extra = 0
 
@@ -22,7 +24,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ('organization',)
     search_fields = ('surname', 'name', 'patricity',)
     readonly_fields = ['id', 'photo_image', 'main_diploma_scan_image', 'gesture_diploma_scan_image', 'passport_part1_scan_image',
-                       'passport_part2_scan_image', 'characteristic_image', 'employment_history_frame', 'attestation_certificate_scan_image']
+                       'passport_part2_scan_image', 'characteristic_image', 'employment_history_frame', 'attestation_certificate_scan_image', 'requests_set']
     fieldsets = (
         ("Шаг 1. Личные данные", {
             'classes': ('extrapretty'),
@@ -41,6 +43,8 @@ class CustomUserAdmin(admin.ModelAdmin):
                        'characteristic_image', 'employment_history', 'employment_history_frame')}),
         ("Шаг 6. Теоретическая часть аттестации", {
             'fields': ('attestation_certificate_number', 'attestation_certificate_date', 'attestation_certificate_scan', 'attestation_certificate_scan_image')}),
+        ("Заявки", {
+            'fields': ('requests_set',)}),
     )
     inlines = (RequestInline,)
 
@@ -134,6 +138,35 @@ class CustomUserAdmin(admin.ModelAdmin):
         tag_string += f'<a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/">Сформировать заявление на аттестацию</a>'
         return format_html(tag_string)
     action_set.short_description = "Действия"
+
+    def requests_set(self, obj):
+        link_set_string = "<table> \
+            <tr><th>Ссылка</th><th>Статус</th><th>Оплачена</th><th>Комментарий</th></tr>"
+        requests = Request.objects.filter(user=obj)
+        for request in requests:
+
+            register = RequestRegister.objects.filter(request=request)
+            try:
+                if register[0] is not None:
+                    additional_nulls = ""
+                    if register[0].order < 10:
+                        additional_nulls += "00"
+                    elif register[0].order < 100:
+                        additional_nulls += "0"
+                    register_number = "06-10-" + \
+                        additional_nulls+str(register[0].order)
+            except IndexError:
+                register_number = "-"
+
+            status = request.status
+            is_paid = "Да" if request.is_paid else "Нет"
+            comment = request.comment if request.comment != "" else "-"
+            # switch:
+            link_set_string += f'<tr><td><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/">{register_number}</a></td><td>{status}</td><td>{is_paid}</td><td>{comment}</td></tr>'
+
+        link_set_string += "</table>"
+        return format_html(link_set_string)
+    requests_set.short_description = "Ссылки на заявки"
 
 
 class RequestsAdmin(admin.ModelAdmin):

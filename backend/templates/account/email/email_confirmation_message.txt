@@ -1,0 +1,8 @@
+{% load account %}{% user_display user as user_display %}{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Здравствуйте!
+
+Вы получили это письмо потому что данный e-mail был указан при регистрации на сайте ЦНИИ Русского жестового языка.
+
+Чтобы завершить регистрацию и подтвердить e-mail, перейдите по следующей ссылке: {{ activate_url }}
+{% endblocktrans %}{% endautoescape %}
+
+Если вы не регистрировались на сайте и не указывали данный e-mail, проигнорируйте это письмо.

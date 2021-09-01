@@ -19,6 +19,10 @@ from rest_framework import routers
 # from graphene_django.views import GraphQLView
 from graphene_file_upload.django import FileUploadGraphQLView
 # from documents import views
+from dj_rest_auth.registration.views import VerifyEmailView
+from allauth.account.views import ConfirmEmailView
+from allauth.account.views import confirm_email
+import users.views
 
 router = routers.DefaultRouter()
 admin.autodiscover()
@@ -28,7 +32,12 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
+    path(r'api/auth/registration/account-email-verification-sent/',
+         users.views.null_view, name='account_email_verification_sent'),
+    path('api/auth/registration/account-confirm-email/<key>[-:\w]/',
+         ConfirmEmailView.as_view(), name='account_confirm_email'),
+    path(r'api/auth/registration/complete/', users.views.complete_view,
+         name='account_confirm_complete'),
     path('api/documents/', include('documents.urls')),
-    # path('api/graphql/', GraphQLView.as_view(graphiql=True)),
     path('api/graphql/', FileUploadGraphQLView.as_view(graphiql=True))
 ]
