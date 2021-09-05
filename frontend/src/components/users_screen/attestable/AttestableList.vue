@@ -41,11 +41,21 @@
               >
                 Редактировать <v-icon dark>mdi-arrow-right</v-icon>
               </v-btn>
-              <v-btn icon tile depressed @click="deleteRequest(row.item.id)">
+              <v-btn
+                :disabled="row.item.requestNumber != '-'"
+                :style="{
+                  visibility:
+                    row.item.requestNumber != '-' ? 'hidden' : 'visible'
+                }"
+                icon
+                tile
+                depressed
+                @click="deleteRequest(row.item.id)"
+              >
                 <v-icon dark> mdi-delete </v-icon>
               </v-btn>
             </div>
-            <div v-else>-</div>
+            <div class="d-flex justify-end" v-else>-</div>
           </td>
         </tr>
       </template>
