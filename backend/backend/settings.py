@@ -200,7 +200,7 @@ USE_TZ = True
 
 # STATIC FILE CONFIGURATION
 # STATIC_ROOT = str(ROOT_DIR('staticfiles'))
-STATIC_ROOT = "/home/sancho1/public_html/static"
+STATIC_ROOT = "/home/sancho1/api-att.surd.su/static"
 
 STATIC_URL = '/static/'
 
@@ -218,7 +218,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # MEDIA CONFIGURATION
 # MEDIA_ROOT = str(ROOT_DIR('media'))
-MEDIA_ROOT = "/home/sancho1/public_html/media"
+MEDIA_ROOT = "/home/sancho1/api-att.surd.su/media"
 MEDIA_URL = '/media/'
 
 GRAPHENE = {
