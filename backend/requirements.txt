@@ -3,7 +3,9 @@ django
 django-environ
 django-extensions
 djangorestframework
-psycopg2-binary
+# psycopg2-binary
+mysqlclient
+django-mysql
 secretary
 ezodf
 odfpy

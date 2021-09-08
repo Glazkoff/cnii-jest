@@ -2,18 +2,27 @@ version: "3.7"
 
 services:
   # База данных
-  postgres:
-    image: postgres:10-alpine
-    volumes:
-      - db_data:/var/lib/postgresql/data
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
     env_file: .env
+    restart: always
+    command:
+      [
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_general_ci"
+      ]
+    volumes:
+      - db_mysql:/var/lib/mysql
 
   # Бэкенд Django
   backend:
     build:
       context: ./backend
     depends_on:
-      - postgres
+      - db
     volumes:
       - ./backend:/app
     command: /start.sh
@@ -37,6 +46,8 @@ services:
     ports:
       - "8003:80"
     depends_on:
+      - db
+      - frontend
       - backend
     volumes:
       - ./backend/media/:/media/
@@ -46,4 +57,4 @@ services:
     # driver: none
 
 volumes:
-  db_data: {}
+  db_mysql: {}

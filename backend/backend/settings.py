@@ -145,14 +145,22 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# # MySQL
+# MYSQL_HOST=mysql
+# MYSQL_DATABASE=db_django
+# MYSQL_USER=root
+# MYSQL_PASSWORD=password
+# MYSQL_ROOT_PASSWORD=password
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env.str('POSTGRES_DB'),
-        'USER': env.str('POSTGRES_USER'),
-        'PASSWORD': env.str('POSTGRES_PASSWORD'),
-        'HOST': 'postgres',
-        'PORT': 5432,
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env.str('MYSQL_DATABASE'),
+        'USER': env.str('MYSQL_USER'),
+        'PASSWORD': env.str('MYSQL_PASSWORD'),
+        'HOST': env.str('MYSQL_HOST'),
+        'PORT': 3306,
+        'OPTIONS': {'charset': 'utf8mb4'},
     },
 }
 
