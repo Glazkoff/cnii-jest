@@ -205,7 +205,7 @@ STATIC_ROOT = "/home/sancho1/public_html/static"
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    str(ROOT_DIR('static')),
+    BASE_DIR+"/assets",
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
