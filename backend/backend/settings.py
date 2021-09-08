@@ -218,7 +218,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # MEDIA CONFIGURATION
 # MEDIA_ROOT = str(ROOT_DIR('media'))
-STATIC_ROOT = "/home/sancho1/public_html/media"
+MEDIA_ROOT = "/home/sancho1/public_html/media"
 MEDIA_URL = '/media/'
 
 GRAPHENE = {
