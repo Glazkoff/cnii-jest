@@ -205,7 +205,7 @@ STATIC_ROOT = "/home/sancho1/api-att.surd.su/static"
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR+"/assets",
+    os.path.join(BASE_DIR, "assets")
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
