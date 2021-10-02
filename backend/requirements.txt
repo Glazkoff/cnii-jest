@@ -6,10 +6,10 @@ djangorestframework
 # psycopg2-binary
 mysqlclient
 django-mysql
-secretary
-ezodf
-odfpy
-lxml
+# secretary
+# ezodf
+# odfpy
+# lxml
 django-admin-interface
 Pillow
 dj-rest-auth[with_social]
@@ -20,7 +20,3 @@ graphene-file-upload
 transliterate
 django-cleanup
 graphene-django-optimizer
-# django-appypod
-# django-webodt
-# django-template-engines
-# django-template-engines
