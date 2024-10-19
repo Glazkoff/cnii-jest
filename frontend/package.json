@@ -14,7 +14,7 @@
     "jwt-decode": "^3.1.2",
     "resolve-url-loader": "^4.0.0",
     "v-mask": "^2.2.4",
-    "vue": "^2.6.11",
+    "vue": "^3.0.0",
     "vue-apollo": "^3.0.0-beta.11",
     "vue-axios": "^3.2.5",
     "vue-router": "^3.2.0",
